@@ -46,6 +46,7 @@ export default function Start({ navigation }) {
           alignSelf: "center",
           textAlign: "center",
           marginTop: 10,
+          width: "90%",
         }}
       >
         Ứng dụng giúp bạn kết nối với những người xung quanh bạn một cách dễ
@@ -55,7 +56,7 @@ export default function Start({ navigation }) {
         style={{
           marginTop: 100,
           height: 60,
-          width: 200,
+          width: 300,
           backgroundColor: Colors.blue,
           justifyContent: "center",
           alignItems: "center",
@@ -65,12 +66,12 @@ export default function Start({ navigation }) {
       >
         <Text
           style={{
-            fontSize: 25,
+            fontSize: 20,
             color: "white",
             fontFamily: Fonts.roboto,
           }}
         >
-          ĐĂNG NHẬP
+          Đăng nhập
         </Text>
       </Pressable>
       <Pressable
@@ -78,8 +79,8 @@ export default function Start({ navigation }) {
         style={{
           marginTop: 40,
           height: 60,
-          width: 200,
-          backgroundColor: Colors.blue,
+          width: 300,
+          backgroundColor: Colors.gray1,
           justifyContent: "center",
           alignItems: "center",
           borderRadius: 30,
@@ -88,12 +89,12 @@ export default function Start({ navigation }) {
       >
         <Text
           style={{
-            fontSize: 25,
-            color: "white",
+            fontSize: 20,
+            color: Colors.black,
             fontFamily: Fonts.roboto,
           }}
         >
-          ĐĂNG KÝ
+          Tạo tài khoản mới
         </Text>
       </Pressable>
     </View>

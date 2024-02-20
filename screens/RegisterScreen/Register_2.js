@@ -67,16 +67,13 @@ export default function Register({ navigation }) {
         </Text>
       </View>
       <TextInput
-        mode="outlined"
-        label="Tên của bạn"
-        onChangeText={(textName) => setTextName(textName)}
-        outlineStyle={{ borderColor: Colors.blue }}
-        activeOutlineColor={Colors.blue}
+        placeholder="Tên của bạn"
         value={textName}
+        underlineColor={Colors.blue}
+        activeUnderlineColor={Colors.blue}
         style={{
           height: 60,
-          marginVertical: 10,
-          marginHorizontal: 30,
+          margin: 10,
           backgroundColor: "white",
           fontSize: 20,
           fontFamily: Fonts.roboto,
@@ -84,14 +81,11 @@ export default function Register({ navigation }) {
         }}
       />
       <Pressable
-        onPress={() => {
-          navigation.navigate("Register_1"), console.log(textName);
-        }}
+        onPress={() => navigation.navigate("Home")}
         style={{
-          marginTop: 50,
-          marginHorizontal: 30,
+          marginTop: 20,
           height: 60,
-          width: "100%",
+          width: 200,
           backgroundColor: Colors.blue,
           justifyContent: "center",
           alignItems: "center",
@@ -101,7 +95,7 @@ export default function Register({ navigation }) {
       >
         <Text
           style={{
-            fontSize: 20,
+            fontSize: 25,
             color: "white",
             fontFamily: Fonts.roboto,
           }}
@@ -109,46 +103,23 @@ export default function Register({ navigation }) {
           Tiếp tục
         </Text>
       </Pressable>
-      <View
+      <Text
         style={{
-          flexDirection: "row",
+          marginTop: 500,
+          width: "80%",
+          fontSize: 16,
+          color: "black",
+          fontFamily: Fonts.roboto,
           alignSelf: "center",
           textAlign: "center",
-          position: "absolute",
+          position: "relative",
           bottom: 20,
         }}
       >
-        <Text
-          style={{
-            fontSize: 16,
-            color: "black",
-            fontFamily: Fonts.roboto,
-          }}
-        >
-          Bạn đã có tài khoản?
-        </Text>
-        <Pressable
-          onPress={() => {
-            navigation.navigate("Login");
-          }}
-        >
-          <Text
-            style={{
-              marginLeft: 5,
-              fontSize: 16,
-              color: Colors.blue,
-              fontWeight: "bold",
-              fontFamily: Fonts.roboto,
-            }}
-          >
-            Đăng nhập ngay
-          </Text>
-        </Pressable>
-      </View>
+        Tiếp tục đồng nghĩa với việc bạn đồng ý với Điều khoản dịch vụ của Zala
+      </Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  backgroundColor: Colors.while,
-});
+const styles = StyleSheet.create({});
