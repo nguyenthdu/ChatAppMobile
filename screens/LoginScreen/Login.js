@@ -50,7 +50,7 @@ export default function Login({ navigation }) {
       >
         <Text
           style={{
-            fontSize: 16,
+            fontSize: 13,
             color: "black",
             fontFamily: Fonts.roboto,
             marginLeft: 10,
@@ -66,7 +66,7 @@ export default function Login({ navigation }) {
         value={textPhone}
         onChangeText={(textPhone) => setTextPhone(textPhone)}
         outlineStyle={{ borderColor: Colors.blue }}
-        activeOutlineColor="blue"
+        activeOutlineColor={Colors.blue}
         right={<TextInput.Icon icon="close" onPress={() => setTextPhone("")} />}
         style={{
           height: 60,
@@ -83,7 +83,7 @@ export default function Login({ navigation }) {
         value={textPassword}
         onChangeText={(textPassword) => setPassword(textPassword)}
         outlineStyle={{ borderColor: Colors.blue }}
-        activeOutlineColor="blue"
+        activeOutlineColor={Colors.blue}
         secureTextEntry={!showPassword}
         right={
           <TextInput.Icon
@@ -132,12 +132,12 @@ export default function Login({ navigation }) {
       >
         <Text
           style={{
-            fontSize: 25,
+            fontSize: 20,
             color: "white",
             fontFamily: Fonts.roboto,
           }}
         >
-          ĐĂNG NHẬP
+          Đăng nhập
         </Text>
       </Pressable>
     </View>
