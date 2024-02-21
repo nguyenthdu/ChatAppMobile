@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import React from "react";
-import { COLORS, FONTS, SIZES } from "../contrains";
+import { COLORS, FONTS, SIZES } from "../constants";
 export default function Start({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.while }}>
