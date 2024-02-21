@@ -1,18 +1,15 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import React from "react";
-import Colors from "../../themes/Colors";
-import Fonts from "../../themes/Fonts";
+import { COLORS, FONTS, SIZES } from "../../contrains";
 export default function Start({ navigation }) {
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.while }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.while }}>
       <Text
         style={{
-          fontSize: 60,
-          color: Colors.blue,
-          fontWeight: "bold",
-          marginTop: 50,
-          fontFamily: Fonts.roboto,
+          marginTop: 100,
+          color: COLORS.blue,
           alignSelf: "center",
+          ...FONTS.h1,
         }}
       >
         ZALA
@@ -20,33 +17,28 @@ export default function Start({ navigation }) {
       <Image
         source={require("../../assets/image/start.png")}
         style={{
-          height: 300,
-          width: "100%",
+          height: SIZES.height * 0.3,
+          width: SIZES.width * 0.7,
           alignSelf: "center",
         }}
       />
       <Text
         style={{
-          fontSize: 20,
-          color: Colors.black,
-          fontFamily: Fonts.roboto,
+          marginTop: 10,
           alignSelf: "center",
           textAlign: "center",
-          marginTop: 10,
-          fontWeight: "bold",
+          ...FONTS.h3,
         }}
       >
         Ứng dụng nhắn số 1 Việt Nam
       </Text>
       <Text
         style={{
-          fontSize: 16,
-          color: Colors.black,
-          fontFamily: Fonts.roboto,
           alignSelf: "center",
           textAlign: "center",
           marginTop: 10,
-          width: "90%",
+          width: SIZES.width * 0.9,
+          ...FONTS.body4,
         }}
       >
         Ứng dụng giúp bạn kết nối với những người xung quanh bạn một cách dễ
@@ -54,44 +46,42 @@ export default function Start({ navigation }) {
       <Pressable
         onPress={() => navigation.navigate("Login")}
         style={{
-          marginTop: 100,
-          height: 60,
-          width: 300,
-          backgroundColor: Colors.blue,
+          height: SIZES.height * 0.07,
+          width: SIZES.width * 0.7,
+          marginTop: 30,
+          backgroundColor: COLORS.blue,
           justifyContent: "center",
           alignItems: "center",
-          borderRadius: 30,
+          borderRadius: SIZES.radius,
           alignSelf: "center",
         }}
       >
         <Text
           style={{
-            fontSize: 20,
-            color: "white",
-            fontFamily: Fonts.roboto,
+            ...FONTS.h3,
+            color: COLORS.while,
           }}
         >
           Đăng nhập
         </Text>
       </Pressable>
       <Pressable
-        onPress={() => navigation.navigate("Register")}
+        // onPress={() => navigation.navigate("Register")}
         style={{
-          marginTop: 40,
-          height: 60,
-          width: 300,
-          backgroundColor: Colors.gray1,
+          height: SIZES.height * 0.07,
+          width: SIZES.width * 0.7,
+          marginTop: 30,
+          backgroundColor: COLORS.gray2,
           justifyContent: "center",
           alignItems: "center",
-          borderRadius: 30,
+          borderRadius: SIZES.radius,
           alignSelf: "center",
         }}
       >
         <Text
           style={{
-            fontSize: 20,
-            color: Colors.black,
-            fontFamily: Fonts.roboto,
+            ...FONTS.h3,
+            color: COLORS.black,
           }}
         >
           Tạo tài khoản mới

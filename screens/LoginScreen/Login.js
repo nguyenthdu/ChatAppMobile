@@ -1,9 +1,28 @@
-import { StyleSheet, Text, View, Image, Pressable } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Pressable,
+  TextInput,
+} from "react-native";
 import React, { useState } from "react";
-import { TextInput } from "react-native-paper";
-import Colors from "../../themes/Colors";
-import Fonts from "../../themes/Fonts";
+import { MaterialIcons } from "@expo/vector-icons";
+import { FONTS, SIZES, COLORS } from "../../contrains";
+
 export default function Login({ navigation }) {
+  // Focus state và hàm setter cho TextInput phone và password
+  const [isPhoneFocused, setIsPhoneFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  // Hàm xử lý khi TextInput phone được focus hoặc mất focus
+  const handlePhoneFocus = () => setIsPhoneFocused(true);
+  const handlePhoneBlur = () => setIsPhoneFocused(false);
+
+  // Hàm xử lý khi TextInput password được focus hoặc mất focus
+  const handlePasswordFocus = () => setIsPasswordFocused(true);
+  const handlePasswordBlur = () => setIsPasswordFocused(false);
+
   const [textPhone, setTextPhone] = React.useState("");
   const [textPassword, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -12,95 +31,113 @@ export default function Login({ navigation }) {
     setShowPassword(!showPassword);
   };
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.while }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.while }}>
       <View
         style={{
-          height: 50,
-          width: "100%",
-          backgroundColor: Colors.blue,
-          flexDirection: "row",
-          alignItems: "center",
-          alignContent: "center",
+          marginHorizontal: SIZES.marginHorizontal,
+          marginTop: 10,
         }}
       >
-        <Pressable onPress={() => navigation.navigate("Start")}>
-          <Image
-            style={{ height: 40, width: 40, marginLeft: 10 }}
-            source={require("../../assets/icon/arrow-left-white.png")}
-          />
-        </Pressable>
-        <Text
-          style={{
-            fontSize: 25,
-            color: "white",
-            fontFamily: Fonts.roboto,
-            marginLeft: 10,
-          }}
-        >
-          Đăng nhập
-        </Text>
+        <MaterialIcons
+          name="arrow-back"
+          size={SIZES.padding * 3}
+          color="black"
+          containerStyle={{ margin: 100 }}
+          onPress={() => navigation.navigate("Start")}
+        />
       </View>
-      <View
+      <Text
         style={{
-          height: 40,
-          width: "100%",
-          backgroundColor: Colors.gray,
-          justifyContent: "center",
+          color: COLORS.blue,
+          ...FONTS.h2,
+          marginHorizontal: SIZES.marginHorizontal,
+          marginTop: 20,
+          textAlign: "center",
         }}
       >
-        <Text
-          style={{
-            fontSize: 13,
-            color: "black",
-            fontFamily: Fonts.roboto,
-            marginLeft: 10,
-          }}
-        >
-          Vui lòng nhập số điện thoại và mật khẩu để đăng nhập
-        </Text>
-      </View>
+        Đăng nhập
+      </Text>
+      <Text
+        style={{
+          fontSize: 16,
+          marginHorizontal: SIZES.marginHorizontal,
+          marginTop: 10,
+          textAlign: "center",
+        }}
+      >
+        Vui lòng nhập số điện thoại và mật khẩu để đăng nhập vào tài khoản của
+        bạn
+      </Text>
+
       {/* TODO: input phone */}
       <TextInput
-        mode="outlined"
-        label="Số điện thoại"
+        placeholder="Nhập số điện thoại"
         value={textPhone}
-        onChangeText={(textPhone) => setTextPhone(textPhone)}
-        outlineStyle={{ borderColor: Colors.blue }}
-        activeOutlineColor={Colors.blue}
-        right={<TextInput.Icon icon="close" onPress={() => setTextPhone("")} />}
+        onChangeText={(text) => setTextPhone(text)}
+        placeholderTextColor={COLORS.gray1}
+        selectionColor={COLORS.blue}
+        keyboardType="phone-pad"
+        onFocus={handlePhoneFocus}
+        onBlur={handlePhoneBlur}
         style={{
-          height: 60,
-          margin: 10,
-          backgroundColor: "white",
-          fontSize: 20,
-          fontFamily: Fonts.roboto,
-          color: Colors.black,
+          height: 48,
+          marginTop: 30,
+          backgroundColor: COLORS.secondaryWhite,
+          color: "#111",
+          borderColor: isPhoneFocused ? COLORS.blue : COLORS.gray1,
+          borderWidth: 1.5,
+          borderRadius: SIZES.padding,
+          paddingLeft: SIZES.padding,
+          ...FONTS.body3,
+          marginHorizontal: SIZES.marginHorizontal,
         }}
       />
-      <TextInput
-        mode="outlined"
-        label="Mật khẩu"
-        value={textPassword}
-        onChangeText={(textPassword) => setPassword(textPassword)}
-        outlineStyle={{ borderColor: Colors.blue }}
-        activeOutlineColor={Colors.blue}
-        secureTextEntry={!showPassword}
-        right={
-          <TextInput.Icon
-            icon="eye"
-            name={showPassword ? "eye-off" : "eye"}
-            onPress={handlePasswordVisibility}
+      {/* TextInput for password */}
+      <View
+        style={{
+          flexDirection: "row",
+          height: 48,
+          marginTop: 20,
+          marginHorizontal: SIZES.marginHorizontal,
+        }}
+      >
+        <TextInput
+          placeholder="Nhập mật khẩu"
+          value={textPassword}
+          onChangeText={(text) => setPassword(text)}
+          placeholderTextColor={COLORS.gray1}
+          selectionColor={COLORS.blue}
+          secureTextEntry={!showPassword}
+          onFocus={handlePasswordFocus}
+          onBlur={handlePasswordBlur}
+          style={{
+            flex: 1,
+            height: "100%",
+            backgroundColor: COLORS.secondaryWhite,
+            color: "#111",
+            borderColor: isPasswordFocused ? COLORS.blue : COLORS.gray1,
+            borderWidth: 1.5,
+            borderRadius: SIZES.padding,
+            paddingLeft: SIZES.padding,
+            ...FONTS.body3,
+          }}
+        />
+        {/* Icon to toggle password visibility */}
+        <Pressable onPress={handlePasswordVisibility}>
+          <MaterialIcons
+            name={showPassword ? "visibility" : "visibility-off"}
+            size={24}
+            color={COLORS.gray1}
+            style={{
+              marginRight: SIZES.padding,
+              position: "absolute",
+              right: 10,
+              top: 12,
+            }}
           />
-        }
-        style={{
-          height: 60,
-          margin: 10,
-          backgroundColor: "white",
-          fontSize: 20,
-          fontFamily: Fonts.roboto,
-          color: Colors.black,
-        }}
-      />
+        </Pressable>
+      </View>
+
       <Pressable
         style={{
           margin: 10,
@@ -108,9 +145,10 @@ export default function Login({ navigation }) {
       >
         <Text
           style={{
-            fontSize: 16,
-            color: Colors.blue,
-            fontFamily: Fonts.roboto,
+            ...FONTS.body4,
+            color: COLORS.blue,
+            marginTop: 10,
+            marginHorizontal: SIZES.marginHorizontal,
           }}
         >
           Lấy lại mật khẩu?
@@ -118,23 +156,27 @@ export default function Login({ navigation }) {
       </Pressable>
       {/* TODO: Đăng nhập thành công truy cập vào trang chủ */}
       <Pressable
-        onPress={() => navigation.navigate("Home")}
+        onPress={() => {
+          navigation.navigate("Home"),
+            console.log("phone: ", textPhone, "password: ", textPassword);
+        }}
         style={{
           marginTop: 20,
-          height: 60,
-          width: 200,
-          backgroundColor: Colors.blue,
+          height: 48,
+          width: SIZES.width * 0.9,
+          marginHorizontal: SIZES.marginHorizontal,
+
+          backgroundColor: COLORS.blue,
           justifyContent: "center",
           alignItems: "center",
-          borderRadius: 30,
+          borderRadius: SIZES.padding,
           alignSelf: "center",
         }}
       >
         <Text
           style={{
-            fontSize: 20,
-            color: "white",
-            fontFamily: Fonts.roboto,
+            color: COLORS.while,
+            ...FONTS.h3,
           }}
         >
           Đăng nhập
