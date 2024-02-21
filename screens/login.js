@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { FONTS, SIZES, COLORS } from "../../contrains";
+import { FONTS, SIZES, COLORS } from "../contrains";
 
 export default function Login({ navigation }) {
   // Focus state và hàm setter cho TextInput phone và password

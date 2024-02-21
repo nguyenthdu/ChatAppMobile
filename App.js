@@ -5,12 +5,10 @@ import { StatusBar, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import LoginScreen from "./screens/LoginScreen/login";
-import StartScreen from "./screens/StartScreen/start";
-import HomeScreen from "./screens/HomeScreen/home";
-// import RegisterScreen from "./screens/RegisterScreen/Register";
-// import RegisterScreen_1 from "./screens/RegisterScreen/Register_1";
-// import RegisterScreen_2 from "./screens/RegisterScreen/Register_2";
+import LoginScreen from "./screens/login";
+import StartScreen from "./screens/start";
+import HomeScreen from "./screens/home";
+
 const Stack = createNativeStackNavigator();
 
 function App() {
@@ -21,9 +19,6 @@ function App() {
         <Stack.Screen name="Start" component={StartScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
-        {/* <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Register_1" component={RegisterScreen_1} />
-        <Stack.Screen name="Register_2" component={RegisterScreen_2} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

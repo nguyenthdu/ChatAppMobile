@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import React from "react";
-import { COLORS, FONTS, SIZES } from "../../contrains";
+import { COLORS, FONTS, SIZES } from "../contrains";
 export default function Start({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.while }}>
@@ -15,7 +15,7 @@ export default function Start({ navigation }) {
         ZALA
       </Text>
       <Image
-        source={require("../../assets/image/start.png")}
+        source={require("../assets/image/start.png")}
         style={{
           height: SIZES.height * 0.3,
           width: SIZES.width * 0.7,
