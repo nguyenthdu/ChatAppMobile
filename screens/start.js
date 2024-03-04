@@ -3,7 +3,7 @@ import React from "react";
 import { COLORS, FONTS, SIZES } from "../constants";
 export default function Start({ navigation }) {
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.while }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <Text
         style={{
           marginTop: 100,
@@ -59,14 +59,14 @@ export default function Start({ navigation }) {
         <Text
           style={{
             ...FONTS.h3,
-            color: COLORS.while,
+            color: COLORS.white,
           }}
         >
           Đăng nhập
         </Text>
       </Pressable>
       <Pressable
-        // onPress={() => navigation.navigate("Register")}
+        onPress={() => navigation.navigate("Register")}
         style={{
           height: SIZES.height * 0.07,
           width: SIZES.width * 0.7,

@@ -6,8 +6,9 @@ export const COLORS = {
   gray: "#f5f5f5",
   gray1: "#C7C8CC", //đậm
   gray2: "#DBDFEA",
-  while: "#ffffff",
+  white: "#ffffff",
   black: "#000000",
+  red: "#FF0000",
   secondaryWhite: "#F7F7FC",
 };
 
