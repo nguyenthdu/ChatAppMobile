@@ -36,6 +36,8 @@ export default function Login({ navigation }) {
         style={{
           marginHorizontal: SIZES.marginHorizontal,
           marginTop: 10,
+          flexDirection: "row",
+          alignItems: "center",
         }}
       >
         <MaterialIcons
@@ -45,18 +47,19 @@ export default function Login({ navigation }) {
           containerStyle={{ margin: 100 }}
           onPress={() => navigation.navigate("Start")}
         />
+        <Text
+          style={{
+            marginLeft: "20%",
+            color: COLORS.blue,
+            ...FONTS.h2,
+            marginHorizontal: SIZES.marginHorizontal,
+            textAlign: "center",
+          }}
+        >
+          Đăng nhập
+        </Text>
       </View>
-      <Text
-        style={{
-          color: COLORS.blue,
-          ...FONTS.h2,
-          marginHorizontal: SIZES.marginHorizontal,
-          marginTop: 20,
-          textAlign: "center",
-        }}
-      >
-        Đăng nhập
-      </Text>
+
       <Text
         style={{
           fontSize: 16,
@@ -68,7 +71,15 @@ export default function Login({ navigation }) {
         Vui lòng nhập số điện thoại và mật khẩu để đăng nhập vào tài khoản của
         bạn
       </Text>
-
+      <Text
+        style={{
+          marginHorizontal: SIZES.marginHorizontal,
+          marginTop: 20,
+          ...FONTS.body3,
+        }}
+      >
+        Số điện thoại
+      </Text>
       {/* TODO: input phone */}
       <TextInput
         placeholder="Nhập số điện thoại"
@@ -81,7 +92,7 @@ export default function Login({ navigation }) {
         onBlur={handlePhoneBlur}
         style={{
           height: 48,
-          marginTop: 30,
+          marginTop: 10,
           backgroundColor: COLORS.secondaryWhite,
           color: "#111",
           borderColor: isPhoneFocused ? COLORS.blue : COLORS.gray1,
@@ -93,11 +104,20 @@ export default function Login({ navigation }) {
         }}
       />
       {/* TextInput for password */}
+      <Text
+        style={{
+          marginHorizontal: SIZES.marginHorizontal,
+          marginTop: 20,
+          ...FONTS.body3,
+        }}
+      >
+        Mật khẩu
+      </Text>
       <View
         style={{
           flexDirection: "row",
           height: 48,
-          marginTop: 20,
+          marginTop: 10,
           marginHorizontal: SIZES.marginHorizontal,
         }}
       >
