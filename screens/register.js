@@ -1,14 +1,8 @@
-import React, { useState } from "react";
-import {
-  Text,
-  View,
-  Pressable,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { FONTS, SIZES, COLORS } from "../constants";
+import React, { useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 import ImagePickerComponent from "../components/image_picker";
+import { COLORS, FONTS, SIZES } from "../constants";
 
 export default function Register({ navigation }) {
   const [isPhoneFocused, setIsPhoneFocused] = useState(false);
@@ -68,7 +62,11 @@ export default function Register({ navigation }) {
     console.log("avatar: ", avatar);
     console.log("Họ và tên: ", textUsername);
     console.log("Số điện thoại: ", textPhone);
-    navigation.navigate("RegisterPassword");
+    navigation.navigate("RegisterPassword", {
+      avatar,
+      username: textUsername,
+      phone: textPhone,
+    });
   };
 
   return (

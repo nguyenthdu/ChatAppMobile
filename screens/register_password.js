@@ -1,15 +1,20 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import {
-  Text,
-  View,
+  Alert,
   Pressable,
+  Text,
   TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { FONTS, SIZES, COLORS } from "../constants";
+import { COLORS, FONTS, SIZES } from "../constants";
+import { callRegister } from "../services/api";
 
-export default function RegisterPassword({ navigation }) {
+export default function RegisterPassword({ navigation, route }) {
+  // Lấy dữ liệu từ màn hình Register
+  const { avatar, username, phone } = route.params;
+
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isRePasswordFocused, setIsRePasswordFocused] = useState(false);
   const [textPassword, setPassword] = useState("");
@@ -46,17 +51,42 @@ export default function RegisterPassword({ navigation }) {
     return true;
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!validatePasswords()) {
       return;
     }
-    navigation.navigate("Home");
-    console.log(
-      "password: ",
-      textPassword,
-      "------- re-enter password: ",
-      textRePassword
-    );
+
+    try {
+      const response = await callRegister(
+        username,
+        textPassword,
+        phone,
+        username,
+        0,
+        "",
+        false
+      );
+      Alert.alert("Đăng ký thành công!");
+      // Xử lý dữ liệu trả về từ API nếu cần
+      console.log(">>> check", response.data);
+      navigation.navigate("Home");
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      if (error.response) {
+        // Request được gửi đi và máy chủ trả về mã lỗi
+        console.error("Error:", error.response.data);
+        Alert.alert(
+          "Đăng ký không thành công",
+          `${error.response.data.message}`
+        );
+      } else if (error.request) {
+        // Request được gửi đi nhưng không có phản hồi từ máy chủ
+        console.error("Error:", error.request);
+      } else {
+        // Có lỗi xảy ra khi thiết lập request
+        console.error("Error:", error.message);
+      }
+    }
   };
 
   return (

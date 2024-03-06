@@ -1,14 +1,15 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import {
+  Alert,
+  Pressable,
   StyleSheet,
   Text,
-  View,
-  Image,
-  Pressable,
   TextInput,
+  View,
 } from "react-native";
-import React, { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { FONTS, SIZES, COLORS } from "../constants";
+import { COLORS, FONTS, SIZES } from "../constants";
+import { callLogin } from "../services/api";
 
 export default function Login({ navigation }) {
   // Focus state và hàm setter cho TextInput phone và password
@@ -23,13 +24,40 @@ export default function Login({ navigation }) {
   const handlePasswordFocus = () => setIsPasswordFocused(true);
   const handlePasswordBlur = () => setIsPasswordFocused(false);
 
-  const [textPhone, setTextPhone] = React.useState("");
+  const [textUserName, setUserName] = React.useState("");
   const [textPassword, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handlePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const handleLogin = async () => {
+    try {
+      const response = await callLogin(textUserName, textPassword);
+      // chưa xử lý lưu access token
+      console.log(response.data);
+      Alert.alert("Đăng nhập thành công!");
+      navigation.navigate("Home");
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      if (error.response) {
+        // Request được gửi đi và máy chủ trả về mã lỗi
+        console.error("Error:", error.response.data);
+        Alert.alert(
+          "Đăng nhập không thành công",
+          `${error.response.data.message}`
+        );
+      } else if (error.request) {
+        // Request được gửi đi nhưng không có phản hồi từ máy chủ
+        console.error("Error:", error.request);
+      } else {
+        // Có lỗi xảy ra khi thiết lập request
+        console.error("Error:", error.message);
+      }
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.while }}>
       <View
@@ -82,12 +110,12 @@ export default function Login({ navigation }) {
       </Text>
       {/* TODO: input phone */}
       <TextInput
-        placeholder="Nhập số điện thoại"
-        value={textPhone}
-        onChangeText={(text) => setTextPhone(text)}
+        placeholder="Nhập user name"
+        value={textUserName}
+        onChangeText={(text) => setUserName(text)}
         placeholderTextColor={COLORS.gray1}
         selectionColor={COLORS.blue}
-        keyboardType="phone-pad"
+        // keyboardType="phone-pad"
         onFocus={handlePhoneFocus}
         onBlur={handlePhoneBlur}
         style={{
@@ -176,10 +204,7 @@ export default function Login({ navigation }) {
       </Pressable>
       {/* TODO: Đăng nhập thành công truy cập vào trang chủ */}
       <Pressable
-        onPress={() => {
-          navigation.navigate("Home"),
-            console.log("phone: ", textPhone, "password: ", textPassword);
-        }}
+        onPress={handleLogin}
         style={{
           marginTop: 20,
           height: 48,
