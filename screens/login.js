@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
   View,
+  TouchableOpacity,
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "../constants";
 import { callLogin } from "../services/api";
@@ -24,7 +25,7 @@ export default function Login({ navigation }) {
   const handlePasswordFocus = () => setIsPasswordFocused(true);
   const handlePasswordBlur = () => setIsPasswordFocused(false);
 
-  const [textUserName, setUserName] = React.useState("");
+  const [textPhone, setPhone] = React.useState("");
   const [textPassword, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -34,7 +35,7 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const response = await callLogin(textUserName, textPassword);
+      const response = await callLogin(textPhone, textPassword);
       // chưa xử lý lưu access token
       console.log(response.data);
       Alert.alert("Đăng nhập thành công!");
@@ -59,7 +60,7 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.while }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View
         style={{
           marginHorizontal: SIZES.marginHorizontal,
@@ -110,9 +111,9 @@ export default function Login({ navigation }) {
       </Text>
       {/* TODO: input phone */}
       <TextInput
-        placeholder="Nhập user name"
-        value={textUserName}
-        onChangeText={(text) => setUserName(text)}
+        placeholder="Nhập số điện thoại của bạn"
+        value={textPhone}
+        onChangeText={(text) => setPhone(text)}
         placeholderTextColor={COLORS.gray1}
         selectionColor={COLORS.blue}
         // keyboardType="phone-pad"
@@ -171,19 +172,22 @@ export default function Login({ navigation }) {
           }}
         />
         {/* Icon to toggle password visibility */}
-        <Pressable onPress={handlePasswordVisibility}>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            position: "absolute",
+            marginRight: SIZES.padding,
+            right: 10,
+            top: 12,
+          }}
+          onPress={handlePasswordVisibility}
+        >
           <MaterialIcons
             name={showPassword ? "visibility" : "visibility-off"}
             size={24}
             color={COLORS.gray1}
-            style={{
-              marginRight: SIZES.padding,
-              position: "absolute",
-              right: 10,
-              top: 12,
-            }}
           />
-        </Pressable>
+        </TouchableOpacity>
       </View>
 
       <Pressable
@@ -210,7 +214,6 @@ export default function Login({ navigation }) {
           height: 48,
           width: SIZES.width * 0.9,
           marginHorizontal: SIZES.marginHorizontal,
-
           backgroundColor: COLORS.blue,
           justifyContent: "center",
           alignItems: "center",
@@ -220,7 +223,7 @@ export default function Login({ navigation }) {
       >
         <Text
           style={{
-            color: COLORS.while,
+            color: COLORS.white,
             ...FONTS.h3,
           }}
         >
