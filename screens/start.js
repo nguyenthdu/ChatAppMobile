@@ -87,6 +87,28 @@ export default function Start({ navigation }) {
           Tạo tài khoản mới
         </Text>
       </Pressable>
+      <Pressable
+        onPress={() => navigation.navigate("Home")}
+        style={{
+          height: SIZES.height * 0.07,
+          width: SIZES.width * 0.7,
+          marginTop: 30,
+          backgroundColor: COLORS.blue,
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: SIZES.radius,
+          alignSelf: "center",
+        }}
+      >
+        <Text
+          style={{
+            ...FONTS.h3,
+            color: COLORS.white,
+          }}
+        >
+          Truy cập trang chủ
+        </Text>
+      </Pressable>
     </View>
   );
 }

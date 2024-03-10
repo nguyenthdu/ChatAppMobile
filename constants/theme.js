@@ -9,7 +9,7 @@ export const COLORS = {
   white: "#ffffff",
   black: "#000000",
   red: "#FF0000",
-  secondaryWhite: "#F7F7FC",
+  secondaryWhite: "E9EDF1 rgba(233, 237, 241, 0.5)",
 };
 
 export const SIZES = {
