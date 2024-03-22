@@ -69,12 +69,12 @@ export default function RegisterPassword({ navigation, route }) {
       Alert.alert("Đăng ký thành công!");
       // Xử lý dữ liệu trả về từ API nếu cần
       console.log(">>> check", response.data);
-      navigation.navigate("Home");
+      navigation.navigate("Login");
     } catch (error) {
       // Xử lý lỗi nếu có
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
-        console.error("Error:", error.response.data);
+        console.log("Error:", error.response.data);
         Alert.alert(
           "Đăng ký không thành công",
           `${error.response.data.message}`
