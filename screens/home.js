@@ -44,7 +44,7 @@ export default function Home({ navigation }) {
           style={{
             flexDirection: "row",
             height: 48,
-            marginTop: 20,
+            marginTop: 10,
             marginHorizontal: SIZES.marginHorizontal,
             borderColor: "gray",
             backgroundColor: COLORS.secondaryWhite,
@@ -87,7 +87,7 @@ export default function Home({ navigation }) {
             alignItems: "center",
             borderWidth: 1,
             borderColor: COLORS.gray2,
-            borderRadius: 10,
+            borderRadius: 12,
             padding: 10,
           }}
         >
@@ -125,7 +125,7 @@ export default function Home({ navigation }) {
             <Text
               style={{
                 ...FONTS.body3,
-                color: isPressGroupChat ? COLORS.white : COLORS.gray1,
+                color: isPressGroupChat ? COLORS.white : COLORS.black,
               }}
             >
               Nhóm
