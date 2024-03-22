@@ -13,19 +13,19 @@ import { COLORS, FONTS, SIZES } from "../constants";
 import { callLogin } from "../services/api";
 
 export default function Login({ navigation }) {
-  // Focus state và hàm setter cho TextInput phone và password
-  const [isPhoneFocused, setIsPhoneFocused] = useState(false);
+  // Focus state và hàm setter cho TextInput UserName và password
+  const [isUserNameFocused, setIsUserNameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
-  // Hàm xử lý khi TextInput phone được focus hoặc mất focus
-  const handlePhoneFocus = () => setIsPhoneFocused(true);
-  const handlePhoneBlur = () => setIsPhoneFocused(false);
+  // Hàm xử lý khi TextInput UserName được focus hoặc mất focus
+  const handleUserNameFocus = () => setIsUserNameFocused(true);
+  const handleUserNameBlur = () => setIsUserNameFocused(false);
 
   // Hàm xử lý khi TextInput password được focus hoặc mất focus
   const handlePasswordFocus = () => setIsPasswordFocused(true);
   const handlePasswordBlur = () => setIsPasswordFocused(false);
 
-  const [textPhone, setPhone] = React.useState("");
+  const [textUserName, setUserName] = React.useState("");
   const [textPassword, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -35,7 +35,7 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const response = await callLogin(textPhone, textPassword);
+      const response = await callLogin(textUserName, textPassword);
       // chưa xử lý lưu access token
       console.log(response.data);
       Alert.alert("Đăng nhập thành công!");
@@ -97,8 +97,7 @@ export default function Login({ navigation }) {
           textAlign: "center",
         }}
       >
-        Vui lòng nhập số điện thoại và mật khẩu để đăng nhập vào tài khoản của
-        bạn
+        Vui lòng nhập tài khoản và mật khẩu để đăng nhập
       </Text>
       <Text
         style={{
@@ -107,24 +106,23 @@ export default function Login({ navigation }) {
           ...FONTS.body3,
         }}
       >
-        Số điện thoại
+        Tài khoản
       </Text>
-      {/* TODO: input phone */}
+      {/* TODO: input UserName */}
       <TextInput
-        placeholder="Nhập số điện thoại của bạn"
-        value={textPhone}
-        onChangeText={(text) => setPhone(text)}
+        placeholder="Nhập tài khoản của bạn"
+        value={textUserName}
+        onChangeText={(text) => setUserName(text)}
         placeholderTextColor={COLORS.gray1}
         selectionColor={COLORS.blue}
-        // keyboardType="phone-pad"
-        onFocus={handlePhoneFocus}
-        onBlur={handlePhoneBlur}
+        onFocus={handleUserNameFocus}
+        onBlur={handleUserNameBlur}
         style={{
           height: 48,
           marginTop: 10,
           backgroundColor: COLORS.secondaryWhite,
           color: "#111",
-          borderColor: isPhoneFocused ? COLORS.blue : COLORS.gray1,
+          borderColor: isUserNameFocused ? COLORS.blue : COLORS.gray1,
           borderWidth: 1.5,
           borderRadius: SIZES.padding,
           paddingLeft: SIZES.padding,

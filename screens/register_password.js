@@ -13,7 +13,7 @@ import { callRegister } from "../services/api";
 
 export default function RegisterPassword({ navigation, route }) {
   // Lấy dữ liệu từ màn hình Register
-  const { avatar, username, phone } = route.params;
+  const { avatar, username, fullname } = route.params;
 
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isRePasswordFocused, setIsRePasswordFocused] = useState(false);
@@ -60,8 +60,8 @@ export default function RegisterPassword({ navigation, route }) {
       const response = await callRegister(
         username,
         textPassword,
-        phone,
-        username,
+        "",
+        fullname,
         0,
         "",
         false
