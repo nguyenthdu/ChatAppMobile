@@ -5,19 +5,19 @@ import ImagePickerComponent from "../components/image_picker";
 import { COLORS, FONTS, SIZES } from "../constants";
 
 export default function Register({ navigation }) {
-  const [isPhoneFocused, setIsPhoneFocused] = useState(false);
-  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+  const [isUserNameFocused, setIsUserNameFocused] = useState(false);
+  const [isFullNameFocused, setIsFullNameFocused] = useState(false);
   const [avatar, setAvatar] = useState(null);
-  const [textUsername, setTextUsername] = useState("");
-  const [textPhone, setTextPhone] = useState("");
-  const [usernameError, setUsernameError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
+  const [textFullName, setTextFullName] = useState("");
+  const [textUserName, setTextUserName] = useState("");
+  const [FullNameError, setFullNameError] = useState("");
+  const [UserNameError, setUserNameError] = useState("");
   const [avatarError, setAvatarError] = useState("");
-  const handleUsernameFocus = () => setIsUsernameFocused(true);
-  const handleUsernameBlur = () => setIsUsernameFocused(false);
+  const handleFullNameFocus = () => setIsFullNameFocused(true);
+  const handleFullNameBlur = () => setIsFullNameFocused(false);
 
-  const handlePhoneFocus = () => setIsPhoneFocused(true);
-  const handlePhoneBlur = () => setIsPhoneFocused(false);
+  const handleUserNameFocus = () => setIsUserNameFocused(true);
+  const handleUserNameBlur = () => setIsUserNameFocused(false);
 
   const handleImageSelect = (imageUri) => {
     setAvatar(imageUri); // Cập nhật đường dẫn của hình ảnh được chọn
@@ -31,41 +31,41 @@ export default function Register({ navigation }) {
     setAvatarError("");
     return true;
   };
-  const validateUsername = () => {
-    if (textUsername.length < 3 || textUsername.length > 32) {
-      setUsernameError("Họ và tên phải từ 3 đến 32 ký tự.");
+  const validateFullName = () => {
+    if (textFullName.length < 3 || textFullName.length > 32) {
+      setFullNameError("Họ và tên phải từ 3 đến 32 ký tự.");
       return false;
     }
     // Kiểm tra ký tự đặc biệt
     const regex = /^[a-zA-Z0-9 ]*$/;
-    if (!regex.test(textUsername)) {
-      setUsernameError("Họ và tên không được chứa ký tự đặc biệt.");
+    if (!regex.test(textFullName)) {
+      setFullNameError("Họ và tên không được chứa ký tự đặc biệt.");
       return false;
     }
-    setUsernameError("");
+    setFullNameError("");
     return true;
   };
 
-  const validatePhone = () => {
-    if (textPhone.length !== 10 || !textPhone.startsWith("0")) {
-      setPhoneError("Số điện thoại phải có 10 ký tự và bắt đầu bằng số 0.");
+  const validateUserName = () => {
+    if (textUserName.length < 8 || textUserName.length > 32) {
+      setUserNameError("Tài khoản của bạn phải từ 8 đến 32.");
       return false;
     }
-    setPhoneError("");
+    setUserNameError("");
     return true;
   };
 
   const handleRegister = () => {
-    if (!validateAvatar() || !validateUsername() || !validatePhone()) {
+    if (!validateAvatar() || !validateFullName() || !validateUserName()) {
       return;
     }
     console.log("avatar: ", avatar);
-    console.log("Họ và tên: ", textUsername);
-    console.log("Số điện thoại: ", textPhone);
+    console.log("Họ và tên: ", textFullName);
+    console.log("Tài khoản của bạn: ", textUserName);
     navigation.navigate("RegisterPassword", {
       avatar,
-      username: textUsername,
-      phone: textPhone,
+      fullname: textFullName,
+      username: textUserName,
     });
   };
 
@@ -106,7 +106,7 @@ export default function Register({ navigation }) {
           textAlign: "center",
         }}
       >
-        Nhập họ tên và số điện thoại của bạn
+        Nhập họ tên và tài khoản của bạn
       </Text>
 
       {/*TODO: avatar */}
@@ -133,19 +133,19 @@ export default function Register({ navigation }) {
       </Text>
       <TextInput
         placeholder="Nhập họ và tên"
-        value={textUsername}
-        onChangeText={(text) => setTextUsername(text)}
+        value={textFullName}
+        onChangeText={(text) => setTextFullName(text)}
         placeholderTextColor={COLORS.gray1}
         selectionColor={COLORS.blue}
         keyboardType="default"
-        onFocus={handleUsernameFocus}
-        onBlur={handleUsernameBlur}
+        onFocus={handleFullNameFocus}
+        onBlur={handleFullNameBlur}
         style={{
           height: 48,
           marginTop: 10,
           backgroundColor: COLORS.secondaryWhite,
           color: "#111",
-          borderColor: isUsernameFocused ? COLORS.blue : COLORS.gray1,
+          borderColor: isFullNameFocused ? COLORS.blue : COLORS.gray1,
           borderWidth: 1.5,
           borderRadius: SIZES.padding,
           paddingLeft: SIZES.padding,
@@ -153,14 +153,14 @@ export default function Register({ navigation }) {
           marginHorizontal: SIZES.marginHorizontal,
         }}
       />
-      {usernameError !== "" && (
+      {FullNameError !== "" && (
         <Text
           style={{
             color: COLORS.red,
             marginHorizontal: SIZES.marginHorizontal,
           }}
         >
-          {usernameError}
+          {FullNameError}
         </Text>
       )}
 
@@ -171,23 +171,23 @@ export default function Register({ navigation }) {
           ...FONTS.body3,
         }}
       >
-        Số điện thoại
+        Tài khoản của bạn
       </Text>
       <TextInput
-        placeholder="Nhập số điện thoại"
-        value={textPhone}
-        onChangeText={(text) => setTextPhone(text)}
+        placeholder="Nhập Tài khoản của bạn"
+        value={textUserName}
+        onChangeText={(text) => setTextUserName(text)}
         placeholderTextColor={COLORS.gray1}
         selectionColor={COLORS.blue}
-        keyboardType="phone-pad"
-        onFocus={handlePhoneFocus}
-        onBlur={handlePhoneBlur}
+        keyboardType="UserName-pad"
+        onFocus={handleUserNameFocus}
+        onBlur={handleUserNameBlur}
         style={{
           height: 48,
           marginTop: 10,
           backgroundColor: COLORS.secondaryWhite,
           color: "#111",
-          borderColor: isPhoneFocused ? COLORS.blue : COLORS.gray1,
+          borderColor: isUserNameFocused ? COLORS.blue : COLORS.gray1,
           borderWidth: 1.5,
           borderRadius: SIZES.padding,
           paddingLeft: SIZES.padding,
@@ -195,14 +195,14 @@ export default function Register({ navigation }) {
           marginHorizontal: SIZES.marginHorizontal,
         }}
       />
-      {phoneError !== "" && (
+      {UserNameError !== "" && (
         <Text
           style={{
             color: COLORS.red,
             marginHorizontal: SIZES.marginHorizontal,
           }}
         >
-          {phoneError}
+          {UserNameError}
         </Text>
       )}
 
