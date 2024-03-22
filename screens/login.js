@@ -6,8 +6,8 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "../constants";
 import { callLogin } from "../services/api";
@@ -38,23 +38,16 @@ export default function Login({ navigation }) {
       const response = await callLogin(textUserName, textPassword);
       // chưa xử lý lưu access token
       console.log(response.data);
-      Alert.alert("Đăng nhập thành công!");
       navigation.navigate("Home");
     } catch (error) {
       // Xử lý lỗi nếu có
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
-        console.error("Error:", error.response.data);
+        console.log("Error:", error.response.data);
         Alert.alert(
           "Đăng nhập không thành công",
-          `${error.response.data.message}`
+          `Mật khẩu hoặc tài khoản không đúng`
         );
-      } else if (error.request) {
-        // Request được gửi đi nhưng không có phản hồi từ máy chủ
-        console.error("Error:", error.request);
-      } else {
-        // Có lỗi xảy ra khi thiết lập request
-        console.error("Error:", error.message);
       }
     }
   };
