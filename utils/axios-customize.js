@@ -1,10 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-
-// 192.168.1.187 là IPv4 address của máy, thay đổi để test
+import { baseUrl } from "./containUrl";
 
 const instance = axios.create({
-  baseURL: "http://192.168.1.187:3000",
+  baseURL: baseUrl,
   headers: { "X-Custom-Header": "foobar" },
 });
 
