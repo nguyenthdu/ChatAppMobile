@@ -2,6 +2,5 @@
 
 ---
 
----
-
-config lại IPv4 address để test (trong file utils > axios-customize.js)
+config lại IPv4 address để test
+click vào đây -> [containUrl](/utils/containUrl.js)
