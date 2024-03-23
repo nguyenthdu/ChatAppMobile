@@ -31,6 +31,10 @@ export const MessageAPI = {
   getListUserMessage: () => {
     return axios.get("/user/users-sidebar");
   },
+
+  getListOneUserMessage: (currentUserId, recipientId) => {
+    return axios.get(`/messages/${currentUserId}/${recipientId}`);
+  },
 };
 
 // Các API để tạo phòng chat, tham gia phòng chat, rời khỏi phòng chat, lấy danh sách các phòng chat có sẵn
