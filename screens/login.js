@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { callLogin } from "../services/api";
+import { AuthAPI } from "../services/api";
 import { storeCurrentUser, storeTokens } from "../utils/AsyncStorage";
 
 export default function Login({ navigation }) {
@@ -36,7 +36,7 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const response = await callLogin(textUserName, textPassword);
+      const response = await AuthAPI.login(textUserName, textPassword);
       // lưu access, refresh token
       const { accessToken, refreshToken } = response.data.tokens;
       await storeTokens(accessToken, refreshToken);
