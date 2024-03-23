@@ -1,23 +1,24 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import {
-  Text,
-  View,
-  TextInput,
-  SafeAreaView,
-  TouchableOpacity,
   FlatList,
   Image,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import React from "react";
-import { MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "../constants";
-//lấy dữ liệu từ file data_test.js
-import data from "../constants/data_test";
+import { MessageAPI } from "../services/api";
 
 export default function Home({ navigation }) {
   const [isPressAllChat, setIsPressAllChat] = React.useState(true);
   const [isPressGroupChat, setIsPressGroupChat] = React.useState(false);
+  const [data, setData] = useState([]);
+
   const handleAllChatPress = () => {
     setIsPressAllChat(true);
     setIsPressGroupChat(false);
@@ -28,6 +29,19 @@ export default function Home({ navigation }) {
   };
 
   const [textSearch, setSearch] = React.useState("");
+
+  useEffect(() => {
+    fetchListUserMessage();
+  }, []);
+
+  const fetchListUserMessage = async () => {
+    try {
+      const res = await MessageAPI.getListUserMessage();
+      setData(res.data);
+    } catch (error) {
+      console.log("Error fetching list user message:", error);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -135,103 +149,66 @@ export default function Home({ navigation }) {
 
         {/* List chat */}
         <FlatList
-          data={data.filter((item) =>
-            item.room_name.toLowerCase().includes(textSearch.toLowerCase())
-          )}
-          keyExtractor={(item) => item.room_id.toString()}
-          renderItem={({ item }) => {
-            const latestMessage = item.user_reservations.reduce((acc, cur) => {
-              const lastMsg = cur.message[cur.message.length - 1];
-              if (
-                !acc ||
-                new Date(lastMsg.created_at) > new Date(acc.created_at)
-              ) {
-                return lastMsg;
-              }
-              return acc;
-            }, null);
-
-            return (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Chat", { conversation: item })
-                }
+          data={data}
+          keyExtractor={(item) => item?.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Chat", { recipient: item })}
+              style={{
+                marginTop: 15,
+                marginHorizontal: SIZES.marginHorizontal,
+                borderRadius: 10,
+                height: 60,
+                justifyContent: "center",
+              }}
+            >
+              <View
                 style={{
-                  marginTop: 15,
-                  marginHorizontal: SIZES.marginHorizontal,
-                  borderRadius: 10,
-                  height: 60,
-                  justifyContent: "center",
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
               >
+                <Image
+                  style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 25,
+                  }}
+                  source={
+                    item.avatar
+                      ? { uri: item.avatar }
+                      : require("../assets/image/avatar.png")
+                  }
+                />
                 <View
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
+                    marginLeft: 10,
+                    height: 40,
+                    flex: 1,
+                    justifyContent: "space-around",
                   }}
                 >
-                  <Image
+                  <Text
                     style={{
-                      width: 50,
-                      height: 50,
-                      borderRadius: 25,
-                    }}
-                    source={{ uri: item.avatar_room }}
-                  />
-                  <View
-                    style={{
-                      marginLeft: 10,
-                      height: 40,
-                      flex: 1,
-                      justifyContent: "space-around",
+                      fontSize: 16,
+                      color: COLORS.black,
+                      fontWeight: "bold",
+                      fontFamily: "Roboto",
                     }}
                   >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          color: COLORS.black,
-                          fontWeight: "bold",
-                          fontFamily: "Roboto",
-                        }}
-                      >
-                        {item.room_name}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          color: COLORS.gray1,
-                          fontFamily: "Roboto",
-                        }}
-                      >
-                        {latestMessage
-                          ? `${new Date(
-                              latestMessage.created_at
-                            ).getHours()}:${new Date(
-                              latestMessage.created_at
-                            ).getMinutes()}`
-                          : ""}
-                      </Text>
-                    </View>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color: COLORS.gray1,
-                        fontFamily: "Roboto",
-                      }}
-                    >
-                      {latestMessage ? latestMessage.message : ""}
-                    </Text>
-                  </View>
+                    {item.username}
+                  </Text>
+                  {/* Dấu gạch ngang */}
+                  <View
+                    style={{
+                      height: 1,
+                      backgroundColor: COLORS.gray,
+                    }}
+                  />
                 </View>
-              </TouchableOpacity>
-            );
-          }}
+              </View>
+            </TouchableOpacity>
+          )}
         />
       </SafeAreaView>
     </KeyboardAvoidingView>
