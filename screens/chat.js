@@ -1,87 +1,177 @@
-import { useState, useEffect } from "react";
+// File: Chat.js
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
+  FlatList,
+  KeyboardAvoidingView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
+  View,
 } from "react-native";
-import io from "socket.io-client";
+import { Ionicons } from "react-native-vector-icons";
+import { COLORS } from "../constants";
+import { MessageAPI } from "../services/api";
+import {
+  connectToSocket,
+  disconnectFromSocket,
+  receiveMessage,
+  sendMessage,
+} from "../services/socketApi";
+import { getUserCurrent } from "../utils/AsyncStorage";
 
-export default function Chat({ route }) {
-  const { conversation } = route.params; // Lấy dữ liệu của cuộc trò chuyện từ props
-
-  // Khai báo state để lưu tin nhắn
+const Chat = ({ route, navigation }) => {
+  const { recipient } = route.params;
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  const flatListRef = useRef(null);
 
-  // Kết nối với socket khi màn hình được render
+  const scrollBottom = () => {
+    flatListRef.current.scrollToEnd({ animated: false });
+  };
+
   useEffect(() => {
-    const socket = io("http://localhost:4000"); // Thay YOUR_SOCKET_SERVER_URL bằng địa chỉ socket server của bạn
-
-    // Lắng nghe sự kiện nhận tin nhắn từ server
-    socket.on("newMessage", (message) => {
-      setMessages([...messages, message]);
-    });
-
-    // Return hàm cleanup để ngắt kết nối khi màn hình unmount
+    connectToSocket();
+    fetchCurrentUser();
     return () => {
-      socket.disconnect();
+      disconnectFromSocket();
     };
   }, []);
 
-  // Hàm gửi tin nhắn
-  const sendMessage = () => {
-    // Gửi tin nhắn đến server
-    // Thông thường, bạn sẽ gửi tin nhắn lên server để nó chuyển đến các người dùng khác trong cuộc trò chuyện
-    // Ở đây, chúng ta chỉ cập nhật giao diện người dùng mà không gửi thực sự tin nhắn đi
-    setMessages([...messages, { content: newMessage, sender: "me" }]);
+  const fetchCurrentUser = async () => {
+    try {
+      const me = JSON.parse(await getUserCurrent());
+      setCurrentUser(me);
+      fetchMessages(me);
+    } catch (error) {
+      console.log("Error fetching current user: ", error);
+    }
+  };
+
+  const fetchMessages = async (currentUser) => {
+    try {
+      const response = await MessageAPI.getListOneUserMessage(
+        currentUser.id,
+        recipient.id
+      );
+      setMessages(response.data);
+    } catch (error) {
+      console.log("Error fetching messages: ", error);
+    }
+  };
+
+  useEffect(() => {
+    receiveMessage((message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+      scrollBottom();
+    });
+  }, []);
+
+  const handleSendMessage = async () => {
+    if (newMessage.trim() === "" || !currentUser) {
+      return;
+    }
+
+    sendMessage({
+      userId: currentUser.id,
+      recipientId: recipient.id,
+      text: newMessage,
+    });
+
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { userId: currentUser.id, recipientId: recipient.id, text: newMessage },
+    ]);
     setNewMessage("");
+    scrollBottom();
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
-    >
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            style={[{ marginRight: 10 }]}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={30} color={COLORS.white} />
+          </TouchableOpacity>
+          <Text style={styles.username}>{recipient.username}</Text>
+        </View>
+        <View style={styles.callButtons}>
+          <TouchableOpacity style={styles.iconContainer}>
+            <Ionicons name="call-outline" size={30} color={COLORS.white} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconContainer}>
+            <Ionicons name="videocam-outline" size={30} color={COLORS.white} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      {/* End Header */}
+
       <View style={{ flex: 1, padding: 10 }}>
-        {/* Hiển thị cuộc trò chuyện */}
         <FlatList
+          ref={flatListRef}
+          onContentSizeChange={scrollBottom}
           data={messages}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <View
               style={[
                 styles.messageContainer,
-                item.sender === "me" ? styles.myMessage : styles.otherMessage,
+                item.recipientId === recipient.id
+                  ? styles.otherMessage
+                  : styles.myMessage,
               ]}
             >
-              <Text style={styles.messageText}>{item.content}</Text>
+              <Text style={styles.messageText}>{item.text}</Text>
             </View>
           )}
         />
-        {/* Phần nhập tin nhắn */}
         <View style={styles.inputContainer}>
           <TextInput
             value={newMessage}
             onChangeText={(text) => setNewMessage(text)}
             style={styles.input}
             placeholder="Type your message..."
-            onSubmitEditing={sendMessage}
+            onSubmitEditing={handleSendMessage}
           />
-          <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+          <TouchableOpacity
+            onPress={handleSendMessage}
+            style={styles.sendButton}
+          >
             <Text style={{ color: "white", fontWeight: "bold" }}>Send</Text>
           </TouchableOpacity>
         </View>
       </View>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EAEAEA",
+    backgroundColor: COLORS.blue,
+  },
+  username: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  callButtons: {
+    flexDirection: "row",
+  },
+  iconContainer: {
+    marginLeft: 10,
+  },
   messageContainer: {
     padding: 10,
     borderRadius: 10,
@@ -89,12 +179,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   myMessage: {
-    alignSelf: "flex-end",
-    backgroundColor: "#DCF8C5",
-  },
-  otherMessage: {
     alignSelf: "flex-start",
     backgroundColor: "#EAEAEA",
+  },
+  otherMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#DCF8C5",
   },
   messageText: {
     fontSize: 16,
@@ -116,7 +206,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   sendButton: {
-    backgroundColor: "blue",
+    backgroundColor: COLORS.blue,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
@@ -124,3 +214,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+export default Chat;
