@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { callRegister } from "../services/api";
+import { AuthAPI } from "../services/api";
 
 export default function RegisterPassword({ navigation, route }) {
   // Lấy dữ liệu từ màn hình Register
@@ -57,14 +57,14 @@ export default function RegisterPassword({ navigation, route }) {
     }
 
     try {
-      const response = await callRegister(
+      const response = await AuthAPI.register(
         username,
         textPassword,
         "",
         fullname,
         0,
         "",
-        false
+        true
       );
       Alert.alert("Đăng ký thành công!");
       // Xử lý dữ liệu trả về từ API nếu cần
