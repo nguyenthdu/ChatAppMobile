@@ -1,5 +1,23 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+export const storeCurrentUser = async (currentUser) => {
+  try {
+    await AsyncStorage.setItem("currentUser", JSON.stringify(currentUser));
+    console.log("User data stored successfully.");
+  } catch (error) {
+    console.log("Error storing user data:", error);
+  }
+};
+
+export const getUserCurrent = async () => {
+  try {
+    return await AsyncStorage.getItem("currentUser");
+  } catch (error) {
+    console.log("Error getting tokens:", error);
+    return null;
+  }
+};
+
 // Lưu access token và refresh token vào AsyncStorage
 export const storeTokens = async (accessToken, refreshToken) => {
   try {
