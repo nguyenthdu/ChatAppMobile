@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "../constants";
 import { callLogin } from "../services/api";
+import { storeCurrentUser, storeTokens } from "../utils/AsyncStorage";
 
 export default function Login({ navigation }) {
   // Focus state và hàm setter cho TextInput UserName và password
@@ -36,8 +37,14 @@ export default function Login({ navigation }) {
   const handleLogin = async () => {
     try {
       const response = await callLogin(textUserName, textPassword);
-      // chưa xử lý lưu access token
-      console.log(response.data);
+      // lưu access, refresh token
+      const { accessToken, refreshToken } = response.data.tokens;
+      await storeTokens(accessToken, refreshToken);
+      // lưu user current
+      const { user } = response.data;
+      await storeCurrentUser(user);
+
+      // console.log("Data: ", response.data);
       navigation.navigate("Home");
     } catch (error) {
       // Xử lý lỗi nếu có
