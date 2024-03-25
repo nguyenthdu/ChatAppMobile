@@ -1,7 +1,14 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { clearTokens } from "../utils/AsyncStorage";
 
 export default function Profile({ navigation }) {
+  const handleLogout = async () => {
+    await clearTokens();
+    // await AuthAPI.logout();
+    navigation.navigate("Start");
+  };
+
   return (
     <View>
       <Text
@@ -20,7 +27,7 @@ export default function Profile({ navigation }) {
           padding: 10,
           borderRadius: 5,
         }}
-        onPress={() => navigation.navigate("Start")}
+        onPress={() => handleLogout()}
       >
         <Text
           style={{
@@ -29,7 +36,7 @@ export default function Profile({ navigation }) {
             color: "white",
           }}
         >
-          Quay lại trang bắt đầu
+          Đăng xuất
         </Text>
       </Pressable>
     </View>
