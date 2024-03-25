@@ -21,6 +21,10 @@ export const AuthAPI = {
       password,
     });
   },
+
+  logout: () => {
+    // return axios.post("/auth/signOut");
+  },
 };
 
 // get thong tin người dùng
