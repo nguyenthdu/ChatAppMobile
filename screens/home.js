@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { NotificationCustom } from "../components/notification/notification";
 import { COLORS, FONTS, SIZES } from "../constants";
 import { MessageAPI } from "../services/api";
 
@@ -40,6 +41,7 @@ export default function Home({ navigation }) {
       setData(res.data);
     } catch (error) {
       console.log("Error fetching list user message:", error);
+      NotificationCustom.errorNotLogin({ navigation });
     }
   };
 

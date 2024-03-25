@@ -1,7 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -9,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { NotificationCustom } from "../components/notification/notification";
 import { COLORS, FONTS, SIZES } from "../constants";
 import { AuthAPI } from "../services/api";
 import { storeCurrentUser, storeTokens } from "../utils/AsyncStorage";
@@ -51,10 +51,7 @@ export default function Login({ navigation }) {
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
         console.log("Error:", error.response.data);
-        Alert.alert(
-          "Đăng nhập không thành công",
-          `Mật khẩu hoặc tài khoản không đúng`
-        );
+        NotificationCustom.errorLogin();
       }
     }
   };
