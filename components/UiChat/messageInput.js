@@ -15,7 +15,7 @@ const MessageInput = ({ setNewMessage, newMessage, handleSendMessage }) => {
         value={newMessage}
         onChangeText={(text) => setNewMessage(text)}
         style={styles.input}
-        placeholder="Type your message..."
+        placeholder="Tin nhắn"
         onSubmitEditing={handleSendMessage}
       />
       <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
