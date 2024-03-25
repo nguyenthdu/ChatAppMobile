@@ -12,12 +12,8 @@ import {
 import { Ionicons } from "react-native-vector-icons";
 import { COLORS } from "../constants";
 import { MessageAPI } from "../services/api";
-import {
-  connectToSocket,
-  disconnectFromSocket,
-  receiveMessage,
-  sendMessage,
-} from "../services/socketApi";
+
+import useSocket from "../services/useSocket";
 import { getUserCurrent } from "../utils/AsyncStorage";
 
 const Chat = ({ route, navigation }) => {
@@ -26,17 +22,14 @@ const Chat = ({ route, navigation }) => {
   const [newMessage, setNewMessage] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const flatListRef = useRef(null);
+  const { sendMessage } = useSocket({ setMessages });
 
   const scrollBottom = () => {
     flatListRef.current.scrollToEnd({ animated: false });
   };
 
   useEffect(() => {
-    connectToSocket();
     fetchCurrentUser();
-    return () => {
-      disconnectFromSocket();
-    };
   }, []);
 
   const fetchCurrentUser = async () => {
@@ -61,28 +54,23 @@ const Chat = ({ route, navigation }) => {
     }
   };
 
-  useEffect(() => {
-    receiveMessage((message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-      scrollBottom();
-    });
-  }, []);
-
   const handleSendMessage = async () => {
     if (newMessage.trim() === "" || !currentUser) {
       return;
     }
 
-    sendMessage({
+    const newMessageSendServer = {
+      text: newMessage,
       userId: currentUser.id,
       recipientId: recipient.id,
-      text: newMessage,
-    });
+      created_at: new Date(),
+      user: currentUser,
+    };
 
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { userId: currentUser.id, recipientId: recipient.id, text: newMessage },
-    ]);
+    sendMessage(newMessageSendServer);
+
+    setMessages((prevMessages) => [...prevMessages, newMessageSendServer]);
+
     setNewMessage("");
     scrollBottom();
   };
@@ -142,7 +130,7 @@ const Chat = ({ route, navigation }) => {
             onPress={handleSendMessage}
             style={styles.sendButton}
           >
-            <Text style={{ color: "white", fontWeight: "bold" }}>Send</Text>
+            <Text style={{ color: "white", fontWeight: "bold" }}>Gửi</Text>
           </TouchableOpacity>
         </View>
       </View>
