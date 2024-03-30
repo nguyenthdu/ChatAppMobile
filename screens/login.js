@@ -1,16 +1,17 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  Alert,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
-  View,
   TouchableOpacity,
+  View,
 } from "react-native";
+import { NotificationCustom } from "../components/notification/notification";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { callLogin } from "../services/api";
+import { AuthAPI } from "../services/api";
+import { storeCurrentUser, storeTokens } from "../utils/AsyncStorage";
 
 export default function Login({ navigation }) {
   // Focus state và hàm setter cho TextInput UserName và password
@@ -35,26 +36,22 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const response = await callLogin(textUserName, textPassword);
-      // chưa xử lý lưu access token
-      console.log(response.data);
-      Alert.alert("Đăng nhập thành công!");
+      const response = await AuthAPI.login(textUserName, textPassword);
+      // lưu access, refresh token
+      const { accessToken, refreshToken } = response.data.tokens;
+      await storeTokens(accessToken, refreshToken);
+      // lưu user current
+      const { user } = response.data;
+      await storeCurrentUser(user);
+
+      // console.log("Data: ", response.data);
       navigation.navigate("Home");
     } catch (error) {
       // Xử lý lỗi nếu có
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
-        console.error("Error:", error.response.data);
-        Alert.alert(
-          "Đăng nhập không thành công",
-          `${error.response.data.message}`
-        );
-      } else if (error.request) {
-        // Request được gửi đi nhưng không có phản hồi từ máy chủ
-        console.error("Error:", error.request);
-      } else {
-        // Có lỗi xảy ra khi thiết lập request
-        console.error("Error:", error.message);
+        console.log("Error:", error.response.data);
+        NotificationCustom.errorLogin();
       }
     }
   };

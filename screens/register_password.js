@@ -1,15 +1,15 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  Alert,
   Pressable,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { NotificationCustom } from "../components/notification/notification";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { callRegister } from "../services/api";
+import { AuthAPI } from "../services/api";
 
 export default function RegisterPassword({ navigation, route }) {
   // Lấy dữ liệu từ màn hình Register
@@ -57,28 +57,25 @@ export default function RegisterPassword({ navigation, route }) {
     }
 
     try {
-      const response = await callRegister(
+      const response = await AuthAPI.register(
         username,
         textPassword,
         "",
         fullname,
         0,
         "",
-        false
+        true
       );
-      Alert.alert("Đăng ký thành công!");
+      NotificationCustom.successRegister();
       // Xử lý dữ liệu trả về từ API nếu cần
       console.log(">>> check", response.data);
-      navigation.navigate("Home");
+      navigation.navigate("Login");
     } catch (error) {
       // Xử lý lỗi nếu có
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
-        console.error("Error:", error.response.data);
-        Alert.alert(
-          "Đăng ký không thành công",
-          `${error.response.data.message}`
-        );
+        console.log("Error:", error.response.data);
+        NotificationCustom.errorRegister(error.response.data.message);
       } else if (error.request) {
         // Request được gửi đi nhưng không có phản hồi từ máy chủ
         console.error("Error:", error.request);
