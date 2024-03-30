@@ -44,6 +44,7 @@ function App() {
 function Root() {
   return (
     <Tab.Navigator
+      headerShown={false}
       screenOptions={{
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: "#2f95dc",
