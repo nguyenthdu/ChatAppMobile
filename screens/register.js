@@ -179,7 +179,7 @@ export default function Register({ navigation }) {
         onChangeText={(text) => setTextUserName(text)}
         placeholderTextColor={COLORS.gray1}
         selectionColor={COLORS.blue}
-        keyboardType="UserName-pad"
+        keyboardType="default" // hoặc "ascii-capable"
         onFocus={handleUserNameFocus}
         onBlur={handleUserNameBlur}
         style={{

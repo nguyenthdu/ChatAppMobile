@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Image, View, Pressable, Text } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { COLORS } from "../constants";
-export default function ImagePickerComponent({ onImageSelect }) {
+export default function ImageGroupPicker({ onImageSelect }) {
   const [image, setImage] = useState(null);
   const [isImageSelected, setIsImageSelected] = useState(false);
 
@@ -26,21 +26,16 @@ export default function ImagePickerComponent({ onImageSelect }) {
   };
 
   return (
-    <View
-      style={{
-        marginTop: 10,
-      }}
-    >
+    <View style={{}}>
       {isImageSelected ? (
         <Pressable
           onPress={pickImage}
           style={{
-            height: 120,
-            width: 120,
-            borderRadius: 100,
+            height: 50,
+            width: 50,
+            borderRadius: 50,
             justifyContent: "center",
             alignItems: "center",
-            alignSelf: "center",
             borderWidth: 1,
             borderColor: COLORS.blue,
           }}
@@ -49,9 +44,9 @@ export default function ImagePickerComponent({ onImageSelect }) {
             source={{ uri: image }}
             style={{
               resizeMode: "cover",
-              width: 120,
-              height: 120,
-              borderRadius: 100,
+              width: 50,
+              height: 50,
+              borderRadius: 50,
               borderColor: COLORS.blue,
               borderWidth: 1,
             }}
@@ -61,12 +56,11 @@ export default function ImagePickerComponent({ onImageSelect }) {
         <Pressable
           onPress={pickImage}
           style={{
-            height: 120,
-            width: 120,
-            borderRadius: 100,
+            height: 50,
+            width: 50,
+            borderRadius: 50,
             justifyContent: "center",
             alignItems: "center",
-            alignSelf: "center",
             backgroundColor: COLORS.gray,
             borderColor: COLORS.blue,
             borderWidth: 1,
@@ -75,7 +69,7 @@ export default function ImagePickerComponent({ onImageSelect }) {
           <Text
             style={{ color: COLORS.blue, fontSize: 16, textAlign: "center" }}
           >
-            Chọn ảnh đại diện
+            Chọn ảnh
           </Text>
         </Pressable>
       )}
