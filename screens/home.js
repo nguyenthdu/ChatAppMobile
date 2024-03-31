@@ -31,9 +31,9 @@ export default function Home({ navigation }) {
 
   const [textSearch, setSearch] = React.useState("");
 
-  useEffect(() => {
-    fetchListUserMessage();
-  }, []);
+  // useEffect(() => {
+  //   fetchListUserMessage();
+  // }, []);
 
   const fetchListUserMessage = async () => {
     try {

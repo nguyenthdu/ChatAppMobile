@@ -20,6 +20,9 @@ import Contact from "./screens/contact";
 import Profile from "./screens/profile";
 import Explore from "./screens/explore";
 import Chat from "./screens/chat";
+import AddFriend from "./screens/add_friend";
+import ListFriendsRequest from "./screens/list_friends_request";
+import CreateGroup from "./screens/create_group";
 const Stack = createNativeStackNavigator();
 
 const Tab = createBottomTabNavigator();
@@ -37,6 +40,13 @@ function App() {
         <Stack.Screen name="RegisterPassword" component={RegisterPassword} />
         <Stack.Screen name="Home" component={Root} />
         <Stack.Screen name="Chat" component={Chat} />
+        <Stack.Screen name="AddFriend" component={AddFriend} />
+
+        <Stack.Screen
+          name="ListFriendsRequest"
+          component={ListFriendsRequest}
+        />
+        <Stack.Screen name="CreateGroup" component={CreateGroup} />
       </Stack.Navigator>
     </NavigationContainer>
   );
