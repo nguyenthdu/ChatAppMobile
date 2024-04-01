@@ -11,6 +11,7 @@ export default function Register({ navigation }) {
   const [avatar, setAvatar] = useState(null);
   const [textFullName, setTextFullName] = useState("");
   const [textEmail, setEmail] = useState("");
+  const [textPhone, setPhone] = useState("");
   const [textUserName, setTextUserName] = useState("");
   const [FullNameError, setFullNameError] = useState("");
   const [EmailError, setEmailError] = useState("");
@@ -91,6 +92,7 @@ export default function Register({ navigation }) {
       fullName: textFullName,
       userName: textUserName,
       email: textEmail,
+      phone: textPhone,
     });
   };
 
@@ -230,6 +232,36 @@ export default function Register({ navigation }) {
           {EmailError}
         </Text>
       )}
+      {/* số điện thoại */}
+      <Text
+        style={{
+          marginHorizontal: SIZES.marginHorizontal,
+          marginTop: 20,
+          ...FONTS.body3,
+        }}
+      >
+        Số điện thoại
+      </Text>
+      <TextInput
+        placeholder="Nhập số điện thoại của bạn"
+        value={textPhone}
+        onChangeText={(text) => setPhone(text)}
+        placeholderTextColor={COLORS.gray1}
+        selectionColor={COLORS.blue}
+        keyboardType="phone-pad"
+        style={{
+          height: 48,
+          marginTop: 10,
+          backgroundColor: COLORS.secondaryWhite,
+          color: "#111",
+          borderColor: COLORS.gray1,
+          borderWidth: 1.5,
+          borderRadius: SIZES.padding,
+          paddingLeft: SIZES.padding,
+          ...FONTS.body3,
+          marginHorizontal: SIZES.marginHorizontal,
+        }}
+      />
       {/* username */}
       <Text
         style={{

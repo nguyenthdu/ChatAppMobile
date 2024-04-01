@@ -14,7 +14,7 @@ import { AuthAPI } from "../services/api";
 
 export default function RegisterPassword({ navigation, route }) {
   // Lấy dữ liệu từ màn hình Register
-  const { avatar, userName, fullName, email } = route.params;
+  const { avatar, userName, fullName, email, phone } = route.params;
 
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isRePasswordFocused, setIsRePasswordFocused] = useState(false);
@@ -61,7 +61,7 @@ export default function RegisterPassword({ navigation, route }) {
       const response = await AuthAPI.register(
         userName,
         textPassword,
-        "",
+        phone,
         email,
         fullName,
         avatar

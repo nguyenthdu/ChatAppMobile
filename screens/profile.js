@@ -35,12 +35,9 @@ export default function Profile({ navigation }) {
             source={{ uri: userCurrent.avatar }} // Sử dụng URI của ảnh từ userCurrent
             size={100}
           />
-          <Text style={styles.userInfoText}>
-            {userCurrent.fullName} {"\n"}
-            {userCurrent.userName} {"\n"}
-            {userCurrent.email} {"\n"}
-            {userCurrent.phone}
-          </Text>
+          <Text style={styles.userInfoText}>{userCurrent.fullName}</Text>
+          <Text style={styles.userInfoText}>{userCurrent.email}</Text>
+          <Text style={styles.userInfoText}>{userCurrent.phone}</Text>
         </View>
       )}
       <Text
