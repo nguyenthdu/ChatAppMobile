@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Image, View, Pressable, Text } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import React, { useState } from "react";
+import { Image, Pressable, Text, View } from "react-native";
 import { COLORS } from "../constants";
 export default function ImagePickerComponent({ onImageSelect }) {
   const [image, setImage] = useState(null);
