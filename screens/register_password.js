@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  Alert,
   Pressable,
   Text,
   TextInput,
@@ -13,7 +14,7 @@ import { AuthAPI } from "../services/api";
 
 export default function RegisterPassword({ navigation, route }) {
   // Lấy dữ liệu từ màn hình Register
-  const { avatar, username, fullname } = route.params;
+  const { avatar, userName, fullName, email } = route.params;
 
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isRePasswordFocused, setIsRePasswordFocused] = useState(false);
@@ -58,13 +59,12 @@ export default function RegisterPassword({ navigation, route }) {
 
     try {
       const response = await AuthAPI.register(
-        username,
+        userName,
         textPassword,
         "",
-        fullname,
-        0,
-        "",
-        true
+        email,
+        fullName,
+        avatar
       );
       NotificationCustom.successRegister();
       // Xử lý dữ liệu trả về từ API nếu cần
@@ -75,7 +75,7 @@ export default function RegisterPassword({ navigation, route }) {
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
         console.log("Error:", error.response.data);
-        NotificationCustom.errorRegister(error.response.data.message);
+        Alert.alert("Đăng ký không thành công", error.response.data.message);
       } else if (error.request) {
         // Request được gửi đi nhưng không có phản hồi từ máy chủ
         console.error("Error:", error.request);

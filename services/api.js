@@ -3,15 +3,14 @@ import axios from "../utils/axios-customize";
 
 // author
 export const AuthAPI = {
-  register: (username, password, phone, fullName, age, avatar, is_admin) => {
+  register: (username, password, phone, email, fullName, avatar) => {
     return axios.post(`/auth/signUp`, {
       username,
       password,
       phone,
+      email,
       fullName,
-      age,
       avatar,
-      is_admin,
     });
   },
 
