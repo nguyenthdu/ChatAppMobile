@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   FlatList,
   Image,
@@ -11,9 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { NotificationCustom } from "../components/notification/notification";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { MessageAPI } from "../services/api";
 
 export default function Home({ navigation }) {
   const [isPressAllChat, setIsPressAllChat] = React.useState(true);
@@ -31,19 +29,19 @@ export default function Home({ navigation }) {
 
   const [textSearch, setSearch] = React.useState("");
 
-  useEffect(() => {
-    fetchListUserMessage();
-  }, []);
+  // useEffect(() => {
+  //   fetchListUserMessage();
+  // }, []);
 
-  const fetchListUserMessage = async () => {
-    try {
-      const res = await MessageAPI.getListUserMessage();
-      setData(res.data);
-    } catch (error) {
-      console.log("Error fetching list user message:", error);
-      NotificationCustom.errorNotLogin({ navigation });
-    }
-  };
+  // const fetchListUserMessage = async () => {
+  //   try {
+  //     const res = await MessageAPI.getListUserMessage();
+  //     setData(res.data);
+  //   } catch (error) {
+  //     console.log("Error fetching list user message:", error);
+  //     NotificationCustom.errorNotLogin({ navigation });
+  //   }
+  // };
 
   return (
     <KeyboardAvoidingView
