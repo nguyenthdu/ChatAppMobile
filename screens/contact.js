@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import {
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  SafeAreaView,
+  SectionList,
   StyleSheet,
   Text,
-  View,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Platform,
   TextInput,
   TouchableOpacity,
-  Image,
-  SectionList,
-  Modal,
+  View,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "../constants";
 
 const friends = [
