@@ -38,6 +38,15 @@ export const MessageAPI = {
   sendFriendRequest: (senderId, receiverId) => {
     return axios.post(`/user/send-friend-request`, { receiverId });
   },
+
+  acceptFriendRequest: (senderId, receiverId) => {
+    return axios.post(`/user/accept-friend-request`, { senderId });
+  },
+
+  getListFriendRequestPending: () => {
+    return axios.get(`/user/get-list-friend-request-pending`);
+  },
+
   getListUserMessage: () => {
     return axios.get("/user/users-sidebar");
   },
