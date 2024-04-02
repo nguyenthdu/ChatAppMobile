@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  StyleSheet,
+  Alert,
+  Image,
+  Pressable,
   Text,
-  View,
   TextInput,
   TouchableOpacity,
-  Pressable,
-  Image,
+  View,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "../constants";
+import { MessageAPI } from "../services/api";
+import { getUserCurrent } from "../utils/AsyncStorage";
 
 const data = {
   id: 1,
@@ -21,23 +23,63 @@ const data = {
 const AddFriend = ({ navigation }) => {
   const [textSearch, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState(null);
-  const [searched, setSearched] = useState(false); // Biến để kiểm tra đã thực hiện tìm kiếm hay chưa
+  const [userCurrent, setCurrentUser] = useState();
+  // const [searched, setSearched] = useState(false); // Biến để kiểm tra đã thực hiện tìm kiếm hay chưa
+  // sau 1s sẽ gọi API tìm kiếm user theo số điện thoại
+  const [searched, setSearched] = useState(false);
+  const searchTimeoutRef = useRef(null);
 
-  const handleSearch = () => {
-    // Kiểm tra nếu số điện thoại nhập vào trùng với số điện thoại của bạn
-    //neu  textSearch khong rong va textSearch === data.phone
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
 
-    if (textSearch === data.phone) {
-      setSearchResult(data);
-    } else {
-      setSearchResult(null);
+  const fetchCurrentUser = async () => {
+    try {
+      const me = JSON.parse(await getUserCurrent());
+      setCurrentUser(me);
+    } catch (error) {
+      console.log("Error fetching current user: ", error);
     }
-    setSearched(true); // Đánh dấu đã thực hiện tìm kiếm
   };
+
+  // sau 1s thì tự tìm
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    if (!textSearch) {
+      setSearched(false);
+      return;
+    }
+    searchTimeoutRef.current = setTimeout(async () => {
+      const res = await MessageAPI.findUserByPhone(textSearch);
+      setSearchResult(res.data);
+      setSearched(true);
+    }, 1000);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [textSearch]);
+
+  // tìm ngay lập tức
+  const handleSearch = async () => {
+    setSearched(false);
+    const res = await MessageAPI.findUserByPhone(textSearch);
+    setSearchResult(res.data);
+    setSearched(true);
+  };
+
   //xử lý gửi lời mời kết bạn
-  const handleAddFriend = () => {
-    // Thêm bạn vào danh sách bạn bè
-    // code here
+  const handleAddFriend = async (receiverId) => {
+    const res = await MessageAPI.sendFriendRequest(userCurrent.id, receiverId);
+    console.log("res: ", res.data);
+    if (res.data.message.includes("successfully"))
+      Alert.alert("Thông báo", "Gửi kết bạn thành công.", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
   };
 
   return (
@@ -155,14 +197,15 @@ const AddFriend = ({ navigation }) => {
                 <Image
                   source={{ uri: searchResult.avatar }}
                   style={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: 25,
+                    width: 60,
+                    height: 60,
+                    borderRadius: 90,
                   }}
                 />
                 <View style={{ marginLeft: 10 }}>
-                  <Text style={{ ...FONTS.body3 }}>{searchResult.name}</Text>
-                  <Text style={{ ...FONTS.body4 }}>{searchResult.phone}</Text>
+                  <Text style={{ ...FONTS.body3 }}>
+                    {searchResult.username}
+                  </Text>
                 </View>
               </View>
               <Pressable
@@ -178,7 +221,7 @@ const AddFriend = ({ navigation }) => {
                   name="person-add"
                   size={24}
                   color="white"
-                  onPress={handleAddFriend}
+                  onPress={() => handleAddFriend(searchResult.id)}
                 />
               </Pressable>
             </View>

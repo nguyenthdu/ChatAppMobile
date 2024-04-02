@@ -35,6 +35,9 @@ export const MessageAPI = {
     return axios.get(`/user/search-user/${phone}`);
   },
 
+  sendFriendRequest: (senderId, receiverId) => {
+    return axios.post(`/user/send-friend-request`, { receiverId });
+  },
   getListUserMessage: () => {
     return axios.get("/user/users-sidebar");
   },
