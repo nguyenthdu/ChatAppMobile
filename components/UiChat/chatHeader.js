@@ -33,7 +33,7 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 20,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#EAEAEA",
     backgroundColor: COLORS.blue,
