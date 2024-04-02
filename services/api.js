@@ -47,6 +47,10 @@ export const MessageAPI = {
     return axios.get(`/user/get-list-friend-request-pending`);
   },
 
+  getListFriends: () => {
+    return axios.get(`/user/get-friends`);
+  },
+
   getListUserMessage: () => {
     return axios.get("/user/users-sidebar");
   },
