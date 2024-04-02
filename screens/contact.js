@@ -69,8 +69,23 @@ export default function Contact({ navigation }) {
   const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] =
     useState(false);
   const [friendToDelete, setFriendToDelete] = useState(null);
+  // const [friends, setFriends] = useState([]);
   const [filteredFriends, setFilteredFriends] = useState(friends);
 
+  // get list friend khi screen mount
+  // useEffect(() => {
+  //   fetchListFriend();
+  // }, []);
+
+  // const fetchListFriend = async () => {
+  //   const res = await MessageAPI.getListFriends();
+  //   console.log("res", res.data);
+  //   setFriends(res.data);
+  // };
+
+  // useEffect(() => {
+  //   console.log("Friends", friends);
+  // }, [friends]);
   //TODO:Xử lý nhấn vào item chuyển sang màn hình chat
   const handleItemPress = (item) => {
     console.log("Press", item);
