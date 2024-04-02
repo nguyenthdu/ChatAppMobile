@@ -1,14 +1,14 @@
-// File: Chat.js
 import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
+  Modal,
 } from "react-native";
 import { MessageAPI } from "../services/api";
-
 import ChatHeader from "../components/UiChat/chatHeader";
 import MessageInput from "../components/UiChat/messageInput";
 import useSocket from "../services/useSocket";
@@ -20,6 +20,9 @@ const Chat = ({ route, navigation }) => {
   const [newMessage, setNewMessage] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const flatListRef = useRef(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [messageId, setMessageId] = useState(null);
+
   const { sendMessage } = useSocket({ setMessages });
 
   const scrollBottom = () => {
@@ -72,6 +75,24 @@ const Chat = ({ route, navigation }) => {
     setNewMessage("");
     scrollBottom();
   };
+  //TODO: Xử lý mở modal
+  const handleOpenModal = (item) => {
+    setModalVisible(true);
+    setMessageId(item.id);
+  };
+  //TODO: xử lý thu hồi tin nhắn
+  const handleRecallMessage = async (id) => {
+    // try {
+    //   await MessageAPI.removeMessage(id);
+    //   setMessages((prevMessages) =>
+    //     prevMessages.filter((message) => message.id !== id)
+    //   );
+    //   setModalVisible(false);
+    // } catch (error) {
+    //   console.log("Error recalling message: ", error);
+    // }
+    console.log("Thu hồi tin nhắn", id);
+  };
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
@@ -83,7 +104,8 @@ const Chat = ({ route, navigation }) => {
           data={messages}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <View
+            <TouchableOpacity
+              onLongPress={() => handleOpenModal(item)}
               style={[
                 styles.messageContainer,
                 item.recipientId === recipient.id
@@ -92,7 +114,7 @@ const Chat = ({ route, navigation }) => {
               ]}
             >
               <Text style={styles.messageText}>{item.text}</Text>
-            </View>
+            </TouchableOpacity>
           )}
         />
         <MessageInput
@@ -101,6 +123,46 @@ const Chat = ({ route, navigation }) => {
           newMessage={newMessage}
         />
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <TouchableOpacity
+            style={{ flex: 1, width: "100%" }}
+            onPress={() => setModalVisible(false)}
+          />
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 20,
+              borderRadius: 10,
+              position: "absolute",
+              bottom: 0,
+              width: "100%",
+            }}
+          >
+            <TouchableOpacity onPress={() => handleRecallMessage(messageId)}>
+              <Text style={{ color: "red" }}>Thu hồi tin nhắn</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={{ color: "blue" }}>Hủy</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };

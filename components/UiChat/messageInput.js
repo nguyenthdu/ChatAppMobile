@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,10 +7,30 @@ import {
   View,
 } from "react-native";
 import { COLORS } from "../../constants";
+import * as ImagePicker from "expo-image-picker";
 
 const MessageInput = ({ setNewMessage, newMessage, handleSendMessage }) => {
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const selectImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      // allowsEditing: true,
+      allowsMultipleSelection: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setSelectedImage(result.uri);
+    }
+  };
+
   return (
     <View style={styles.inputContainer}>
+      <TouchableOpacity onPress={selectImage}>
+        <Text style={styles.imageButton}>📷</Text>
+      </TouchableOpacity>
       <TextInput
         value={newMessage}
         onChangeText={(text) => setNewMessage(text)}
@@ -21,6 +41,11 @@ const MessageInput = ({ setNewMessage, newMessage, handleSendMessage }) => {
       <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
         <Text style={{ color: "white", fontWeight: "bold" }}>Gửi</Text>
       </TouchableOpacity>
+
+      {/* Hiển thị hình ảnh đã chọn */}
+      {selectedImage && (
+        <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
+      )}
     </View>
   );
 };
@@ -49,6 +74,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+  },
+  imageButton: {
+    fontSize: 20,
+    paddingHorizontal: 10,
+  },
+  selectedImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
   },
 });
 

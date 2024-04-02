@@ -201,15 +201,16 @@ export default function Home({ navigation }) {
                   >
                     {item.username}
                   </Text>
-                  {/* Dấu gạch ngang */}
-                  <View
-                    style={{
-                      height: 1,
-                      backgroundColor: COLORS.gray,
-                    }}
-                  />
                 </View>
               </View>
+              {/* Dấu gạch ngang */}
+              <View
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#f2f2f2",
+                  marginTop: 10,
+                }}
+              />
             </TouchableOpacity>
           )}
         />
