@@ -1,8 +1,24 @@
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { clearTokens } from "../utils/AsyncStorage";
+import React, { useEffect, useState } from "react";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { FONTS } from "../constants";
+import { clearTokens, getUserCurrent } from "../utils/AsyncStorage";
 
 export default function Profile({ navigation }) {
+  const [userCurrent, setCurrentUser] = useState();
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const me = JSON.parse(await getUserCurrent());
+        setCurrentUser(me);
+      } catch (error) {
+        console.log("Error fetching current user: ", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
   const handleLogout = async () => {
     await clearTokens();
     // await AuthAPI.logout();
@@ -11,6 +27,26 @@ export default function Profile({ navigation }) {
 
   return (
     <View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          source={{ uri: userCurrent?.avatar }}
+          style={{
+            width: 150,
+            height: 150,
+            borderRadius: 90,
+          }}
+        />
+        <View style={{ marginLeft: 10 }}>
+          <Text style={{ ...FONTS.body3 }}>{userCurrent?.username}</Text>
+          <Text style={{ ...FONTS.body4 }}>{userCurrent?.phone}</Text>
+          <Text style={{ ...FONTS.body4 }}>{userCurrent?.email}</Text>
+        </View>
+      </View>
       <Text
         style={{
           fontSize: 16,
