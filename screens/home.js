@@ -31,13 +31,14 @@ export default function Home({ navigation }) {
 
   const [textSearch, setSearch] = React.useState("");
 
-  // useEffect(() => {
-  //   fetchListUserMessage();
-  // }, []);
+  useEffect(() => {
+    fetchListUserMessage();
+  }, []);
 
   const fetchListUserMessage = async () => {
     try {
       const res = await MessageAPI.getListUserMessage();
+      console.log("List user message:", res.data);
       setData(res.data);
     } catch (error) {
       console.log("Error fetching list user message:", error);

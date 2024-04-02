@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import {
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  SafeAreaView,
+  SectionList,
   StyleSheet,
   Text,
-  View,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Platform,
   TextInput,
   TouchableOpacity,
-  Image,
-  SectionList,
-  Modal,
+  View,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "../constants";
 
 const friends = [
@@ -69,8 +69,23 @@ export default function Contact({ navigation }) {
   const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] =
     useState(false);
   const [friendToDelete, setFriendToDelete] = useState(null);
+  // const [friends, setFriends] = useState([]);
   const [filteredFriends, setFilteredFriends] = useState(friends);
 
+  // get list friend khi screen mount
+  // useEffect(() => {
+  //   fetchListFriend();
+  // }, []);
+
+  // const fetchListFriend = async () => {
+  //   const res = await MessageAPI.getListFriends();
+  //   console.log("res", res.data);
+  //   setFriends(res.data);
+  // };
+
+  // useEffect(() => {
+  //   console.log("Friends", friends);
+  // }, [friends]);
   //TODO:Xử lý nhấn vào item chuyển sang màn hình chat
   const handleItemPress = (item) => {
     console.log("Press", item);

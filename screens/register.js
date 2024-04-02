@@ -7,14 +7,22 @@ import { COLORS, FONTS, SIZES } from "../constants";
 export default function Register({ navigation }) {
   const [isUserNameFocused, setIsUserNameFocused] = useState(false);
   const [isFullNameFocused, setIsFullNameFocused] = useState(false);
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [avatar, setAvatar] = useState(null);
   const [textFullName, setTextFullName] = useState("");
+  const [textEmail, setTextEmail] = useState("");
+  const [textPhone, setPhone] = useState("");
   const [textUserName, setTextUserName] = useState("");
   const [FullNameError, setFullNameError] = useState("");
+  const [EmailError, setEmailError] = useState("");
   const [UserNameError, setUserNameError] = useState("");
   const [avatarError, setAvatarError] = useState("");
+
   const handleFullNameFocus = () => setIsFullNameFocused(true);
   const handleFullNameBlur = () => setIsFullNameFocused(false);
+
+  const handleEmailFocus = () => setIsEmailFocused(true);
+  const handleEmailBlur = () => setIsEmailFocused(false);
 
   const handleUserNameFocus = () => setIsUserNameFocused(true);
   const handleUserNameBlur = () => setIsUserNameFocused(false);
@@ -37,7 +45,9 @@ export default function Register({ navigation }) {
       return false;
     }
     // Kiểm tra ký tự đặc biệt
-    const regex = /^[a-zA-Z0-9 ]*$/;
+    // const regex = /^[a-zA-Z0-9 ]*$/;\
+    const regex =
+      /^[a-zA-Z0-9 áàảãạăắằẳẵặâấầẩẫậdđéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵ]*$/;
     if (!regex.test(textFullName)) {
       setFullNameError("Họ và tên không được chứa ký tự đặc biệt.");
       return false;
@@ -46,9 +56,19 @@ export default function Register({ navigation }) {
     return true;
   };
 
+  const validateEmail = () => {
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!regex.test(textEmail)) {
+      setEmailError("Email không hợp lệ.");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
+
   const validateUserName = () => {
-    if (textUserName.length < 8 || textUserName.length > 32) {
-      setUserNameError("Tài khoản của bạn phải từ 8 đến 32.");
+    if (textUserName.length < 2 || textUserName.length > 32) {
+      setUserNameError("Tài khoản của bạn phải từ 2 đến 32.");
       return false;
     }
     setUserNameError("");
@@ -56,7 +76,12 @@ export default function Register({ navigation }) {
   };
 
   const handleRegister = () => {
-    if (!validateAvatar() || !validateFullName() || !validateUserName()) {
+    if (
+      !validateAvatar() ||
+      !validateFullName() ||
+      !validateUserName() ||
+      !validateEmail()
+    ) {
       return;
     }
     console.log("avatar: ", avatar);
@@ -64,8 +89,10 @@ export default function Register({ navigation }) {
     console.log("Tài khoản của bạn: ", textUserName);
     navigation.navigate("RegisterPassword", {
       avatar,
-      fullname: textFullName,
-      username: textUserName,
+      fullName: textFullName,
+      userName: textUserName,
+      email: textEmail,
+      phone: textPhone,
     });
   };
 
@@ -163,7 +190,7 @@ export default function Register({ navigation }) {
           {FullNameError}
         </Text>
       )}
-
+      {/* email */}
       <Text
         style={{
           marginHorizontal: SIZES.marginHorizontal,
@@ -171,10 +198,81 @@ export default function Register({ navigation }) {
           ...FONTS.body3,
         }}
       >
-        Tài khoản của bạn
+        Email
       </Text>
       <TextInput
-        placeholder="Nhập Tài khoản của bạn"
+        placeholder="Nhập email của bạn"
+        value={textEmail}
+        onChangeText={(text) => setTextEmail(text)}
+        placeholderTextColor={COLORS.gray1}
+        selectionColor={COLORS.blue}
+        keyboardType="email-address"
+        onFocus={handleEmailFocus}
+        onBlur={handleEmailBlur}
+        style={{
+          height: 48,
+          marginTop: 10,
+          backgroundColor: COLORS.secondaryWhite,
+          color: "#111",
+          borderColor: isEmailFocused ? COLORS.blue : COLORS.gray1,
+          borderWidth: 1.5,
+          borderRadius: SIZES.padding,
+          paddingLeft: SIZES.padding,
+          ...FONTS.body3,
+          marginHorizontal: SIZES.marginHorizontal,
+        }}
+      />
+      {EmailError !== "" && (
+        <Text
+          style={{
+            color: COLORS.red,
+            marginHorizontal: SIZES.marginHorizontal,
+          }}
+        >
+          {EmailError}
+        </Text>
+      )}
+      {/* số điện thoại */}
+      <Text
+        style={{
+          marginHorizontal: SIZES.marginHorizontal,
+          marginTop: 20,
+          ...FONTS.body3,
+        }}
+      >
+        Số điện thoại
+      </Text>
+      <TextInput
+        placeholder="Nhập số điện thoại của bạn"
+        value={textPhone}
+        onChangeText={(text) => setPhone(text)}
+        placeholderTextColor={COLORS.gray1}
+        selectionColor={COLORS.blue}
+        keyboardType="phone-pad"
+        style={{
+          height: 48,
+          marginTop: 10,
+          backgroundColor: COLORS.secondaryWhite,
+          color: "#111",
+          borderColor: COLORS.gray1,
+          borderWidth: 1.5,
+          borderRadius: SIZES.padding,
+          paddingLeft: SIZES.padding,
+          ...FONTS.body3,
+          marginHorizontal: SIZES.marginHorizontal,
+        }}
+      />
+      <Text
+        style={{
+          marginHorizontal: SIZES.marginHorizontal,
+          marginTop: 20,
+          ...FONTS.body3,
+        }}
+      >
+        Tên tài khoản của bạn
+      </Text>
+      <TextInput
+        placeholder="Nhập tên tài khoản của bạn (user name)"
         value={textUserName}
         onChangeText={(text) => setTextUserName(text)}
         placeholderTextColor={COLORS.gray1}

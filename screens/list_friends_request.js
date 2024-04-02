@@ -1,64 +1,33 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  Image,
-  FlatList,
-} from "react-native";
-import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { COLORS, FONTS, SIZES } from "../constants";
-
-const friends = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 2,
-    name: "Nguyễn Văn B",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 3,
-    name: "Bình Bình",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 4,
-    name: "Bảo",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 5,
-    name: "Anh Tú",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 6,
-    name: "Trúc anh",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 7,
-    name: "Đào Bình Minh",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-];
+import React, { useEffect, useState } from "react";
+import { Alert, FlatList, Image, Pressable, Text, View } from "react-native";
+import { COLORS, SIZES } from "../constants";
+import { MessageAPI } from "../services/api";
 
 export default function ListFriendsRequest({ navigation }) {
+  const [listFriendRequest, setListFriendRequest] = useState([]);
+  useEffect(() => {
+    fetchListFriendRequestPending();
+  }, []);
+
+  const fetchListFriendRequestPending = async () => {
+    const res = await MessageAPI.getListFriendRequestPending();
+    setListFriendRequest(res.data);
+    // console.log("res request: ", res.data);
+  };
+
   // Xử lý chấp nhận lời mời kết bạn
-  const handleAccept = (friendId) => {
-    console.log("Chấp nhận lời mời kết bạn của:", friendId);
+  const handleAccept = (user) => {
+    const acceptFriendRequest = async () => {
+      const res = await MessageAPI.acceptFriendRequest(user?.id);
+      if (res?.data.message.includes("successfully")) {
+        console.log("res", res?.data);
+        fetchListFriendRequestPending();
+        Alert.alert("Thông báo", `Đã là bạn bè với ${user?.username}`);
+      }
+    };
+
+    acceptFriendRequest();
   };
   // Xử lý từ chối lời mời kết bạn
   const handleReject = (friendId) => {
@@ -91,7 +60,7 @@ export default function ListFriendsRequest({ navigation }) {
 
       {/* Danh sách lời mời kết bạn */}
       <FlatList
-        data={friends}
+        data={listFriendRequest}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View
@@ -113,7 +82,9 @@ export default function ListFriendsRequest({ navigation }) {
               }}
             >
               <Image
-                source={{ uri: item.avatar }}
+                source={{
+                  uri: item?.sender?.avatar,
+                }}
                 style={{
                   width: 50,
                   height: 50,
@@ -130,7 +101,7 @@ export default function ListFriendsRequest({ navigation }) {
                   flex: 1,
                 }}
               >
-                {item.name}
+                {item?.sender?.username}
               </Text>
             </View>
             <View
@@ -143,7 +114,7 @@ export default function ListFriendsRequest({ navigation }) {
               }}
             >
               <Pressable
-                onPress={() => handleAccept(item.id)}
+                onPress={() => handleAccept(item?.sender)}
                 style={{
                   flex: 1,
                   height: 30,
