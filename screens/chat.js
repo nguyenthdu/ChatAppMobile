@@ -156,7 +156,13 @@ const Chat = ({ route, navigation }) => {
             <TouchableOpacity onPress={() => handleRecallMessage(messageId)}>
               <Text style={{ color: "red" }}>Thu hồi tin nhắn</Text>
             </TouchableOpacity>
-
+            <View
+              style={{
+                height: 1,
+                backgroundColor: "#EAEAEA",
+                marginVertical: 10,
+              }}
+            />
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={{ color: "blue" }}>Hủy</Text>
             </TouchableOpacity>
@@ -183,7 +189,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#DCF8C5",
   },
   messageText: {
-    fontSize: 16,
+    fontSize: 18,
   },
 });
 
