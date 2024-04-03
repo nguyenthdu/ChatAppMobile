@@ -15,6 +15,7 @@ export default function Register({ navigation }) {
   const [textUserName, setTextUserName] = useState("");
   const [FullNameError, setFullNameError] = useState("");
   const [EmailError, setEmailError] = useState("");
+  const [PhoneError, setPhoneError] = useState("");
   const [UserNameError, setUserNameError] = useState("");
   const [avatarError, setAvatarError] = useState("");
 
@@ -46,10 +47,9 @@ export default function Register({ navigation }) {
     }
     // Kiểm tra ký tự đặc biệt
     // const regex = /^[a-zA-Z0-9 ]*$/;\
-    const regex =
-      /^[a-zA-Z0-9 áàảãạăắằẳẵặâấầẩẫậdđéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵ]*$/;
+    const regex = /^[a-zA-Z ]*$/;
     if (!regex.test(textFullName)) {
-      setFullNameError("Họ và tên không được chứa ký tự đặc biệt.");
+      setFullNameError("Họ và tên không được chứa ký tự đặc biệt và số.");
       return false;
     }
     setFullNameError("");
@@ -59,7 +59,7 @@ export default function Register({ navigation }) {
   const validateEmail = () => {
     const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     if (!regex.test(textEmail)) {
-      setEmailError("Email không hợp lệ.");
+      setEmailError("Email phải có định dạng xxx@gmail.com.");
       return false;
     }
     setEmailError("");
@@ -74,13 +74,24 @@ export default function Register({ navigation }) {
     setUserNameError("");
     return true;
   };
+  const validatePhone = () => {
+    //số điện thoại phải có 10 số và bắt đầu từ 0
+    const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
+    if (!regex.test(textPhone)) {
+      setPhoneError("Số điện thoại phải có 10 số và bắt đầu từ 0");
+      return false;
+    }
+    setPhoneError("");
+    return true;
+  };
 
   const handleRegister = () => {
     if (
       !validateAvatar() ||
       !validateFullName() ||
       !validateUserName() ||
-      !validateEmail()
+      !validateEmail() ||
+      !validatePhone()
     ) {
       return;
     }
@@ -124,17 +135,6 @@ export default function Register({ navigation }) {
           Đăng ký tài khoản
         </Text>
       </View>
-      <Text
-        style={{
-          fontSize: 18,
-          fontWeight: "bold",
-          marginHorizontal: SIZES.marginHorizontal,
-          marginTop: 10,
-          textAlign: "center",
-        }}
-      >
-        Nhập họ tên và tài khoản của bạn
-      </Text>
 
       {/*TODO: avatar */}
       <ImagePickerComponent onImageSelect={handleImageSelect} />
@@ -149,15 +149,6 @@ export default function Register({ navigation }) {
           {avatarError}
         </Text>
       )}
-      <Text
-        style={{
-          marginHorizontal: SIZES.marginHorizontal,
-          marginTop: 10,
-          ...FONTS.body3,
-        }}
-      >
-        Họ và tên
-      </Text>
       <TextInput
         placeholder="Nhập họ và tên"
         value={textFullName}
@@ -190,16 +181,40 @@ export default function Register({ navigation }) {
           {FullNameError}
         </Text>
       )}
-      {/* email */}
-      <Text
+      <TextInput
+        placeholder="Nhập tên tài khoản (user name)"
+        value={textUserName}
+        onChangeText={(text) => setTextUserName(text)}
+        placeholderTextColor={COLORS.gray1}
+        selectionColor={COLORS.blue}
+        keyboardType="default" // hoặc "ascii-capable"
+        onFocus={handleUserNameFocus}
+        onBlur={handleUserNameBlur}
         style={{
-          marginHorizontal: SIZES.marginHorizontal,
-          marginTop: 20,
+          height: 48,
+          marginTop: 10,
+          backgroundColor: COLORS.secondaryWhite,
+          color: "#111",
+          borderColor: isUserNameFocused ? COLORS.blue : COLORS.gray1,
+          borderWidth: 1.5,
+          borderRadius: SIZES.padding,
+          paddingLeft: SIZES.padding,
           ...FONTS.body3,
+          marginHorizontal: SIZES.marginHorizontal,
         }}
-      >
-        Email
-      </Text>
+      />
+      {UserNameError !== "" && (
+        <Text
+          style={{
+            color: COLORS.red,
+            marginHorizontal: SIZES.marginHorizontal,
+          }}
+        >
+          {UserNameError}
+        </Text>
+      )}
+      {/* email */}
+
       <TextInput
         placeholder="Nhập email của bạn"
         value={textEmail}
@@ -233,15 +248,7 @@ export default function Register({ navigation }) {
         </Text>
       )}
       {/* số điện thoại */}
-      <Text
-        style={{
-          marginHorizontal: SIZES.marginHorizontal,
-          marginTop: 20,
-          ...FONTS.body3,
-        }}
-      >
-        Số điện thoại
-      </Text>
+
       <TextInput
         placeholder="Nhập số điện thoại của bạn"
         value={textPhone}
@@ -262,48 +269,16 @@ export default function Register({ navigation }) {
           marginHorizontal: SIZES.marginHorizontal,
         }}
       />
-      <Text
-        style={{
-          marginHorizontal: SIZES.marginHorizontal,
-          marginTop: 20,
-          ...FONTS.body3,
-        }}
-      >
-        Tên tài khoản của bạn
-      </Text>
-      <TextInput
-        placeholder="Nhập tên tài khoản của bạn (user name)"
-        value={textUserName}
-        onChangeText={(text) => setTextUserName(text)}
-        placeholderTextColor={COLORS.gray1}
-        selectionColor={COLORS.blue}
-        keyboardType="default" // hoặc "ascii-capable"
-        onFocus={handleUserNameFocus}
-        onBlur={handleUserNameBlur}
-        style={{
-          height: 48,
-          marginTop: 10,
-          backgroundColor: COLORS.secondaryWhite,
-          color: "#111",
-          borderColor: isUserNameFocused ? COLORS.blue : COLORS.gray1,
-          borderWidth: 1.5,
-          borderRadius: SIZES.padding,
-          paddingLeft: SIZES.padding,
-          ...FONTS.body3,
-          marginHorizontal: SIZES.marginHorizontal,
-        }}
-      />
-      {UserNameError !== "" && (
+      {PhoneError !== "" && (
         <Text
           style={{
             color: COLORS.red,
             marginHorizontal: SIZES.marginHorizontal,
           }}
         >
-          {UserNameError}
+          {PhoneError}
         </Text>
       )}
-
       <Pressable
         onPress={handleRegister}
         style={{

@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 20,
     marginRight: 10,
+    fontSize: 18,
   },
   sendButton: {
     backgroundColor: COLORS.blue,
@@ -74,6 +75,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    fontSize: 18,
   },
   imageButton: {
     fontSize: 20,

@@ -11,16 +11,16 @@ const ChatHeader = ({ recipient, navigation }) => {
           style={[{ marginRight: 10 }]}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={30} color={COLORS.white} />
+          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
         <Text style={styles.username}>{recipient.username}</Text>
       </View>
       <View style={styles.callButtons}>
         <TouchableOpacity style={styles.iconContainer}>
-          <Ionicons name="call-outline" size={30} color={COLORS.white} />
+          <Ionicons name="call-outline" size={24} color={COLORS.white} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconContainer}>
-          <Ionicons name="videocam-outline" size={30} color={COLORS.white} />
+          <Ionicons name="videocam-outline" size={24} color={COLORS.white} />
         </TouchableOpacity>
       </View>
     </View>
@@ -47,7 +47,7 @@ const styles = {
     flexDirection: "row",
   },
   iconContainer: {
-    marginLeft: 10,
+    marginLeft: 30,
   },
 };
 
