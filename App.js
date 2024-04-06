@@ -21,6 +21,7 @@ import Profile from "./screens/profile";
 import RegisterScreen from "./screens/register";
 import RegisterPassword from "./screens/register_password";
 import StartScreen from "./screens/start";
+import UpdateProfile from "./screens/update_profile";
 const Stack = createNativeStackNavigator();
 
 const Tab = createBottomTabNavigator();
@@ -45,6 +46,7 @@ function App() {
           component={ListFriendsRequest}
         />
         <Stack.Screen name="CreateGroup" component={CreateGroup} />
+        <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
       </Stack.Navigator>
     </NavigationContainer>
   );

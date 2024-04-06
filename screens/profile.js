@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { FONTS } from "../constants";
+import { COLORS, FONTS } from "../constants";
 import { clearTokens, getUserCurrent } from "../utils/AsyncStorage";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -49,6 +49,25 @@ export default function Profile({ navigation }) {
           marginHorizontal: 20,
         }}
       >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            padding: 10,
+          }}
+        >
+          <MaterialIcons name="person-2" size={30} color="blue" />
+
+          <Text
+            style={{
+              marginLeft: 10,
+              fontSize: 20,
+              fontFamily: "Roboto",
+            }}
+          >
+            {userCurrent?.fullName}
+          </Text>
+        </View>
         <View
           style={{
             flexDirection: "row",
@@ -126,10 +145,59 @@ export default function Profile({ navigation }) {
           }}
         />
       </View>
+      <View
+        style={{
+          marginTop: 20,
+        }}
+      >
+        <Pressable
+          style={{
+            backgroundColor: "green",
+            padding: 10,
+            borderRadius: 5,
+            marginHorizontal: 20,
+            marginTop: 20,
+            alignItems: "center",
+          }}
+          //truyền thông tin user hiện tại qua màn hình cập nhật thông tin
+          onPress={() => navigation.navigate("UpdateProfile", { userCurrent })}
+        >
+          <Text
+            style={{
+              fontSize: 20,
+              fontFamily: "Roboto",
+              color: "white",
+            }}
+          >
+            Cập nhật thông tin
+          </Text>
+        </Pressable>
+        <Pressable
+          style={{
+            backgroundColor: "blue",
+            padding: 10,
+            borderRadius: 5,
+            marginHorizontal: 20,
+            marginTop: 20,
+            alignItems: "center",
+          }}
+          onPress={() => navigation.navigate("ChangePassword")}
+        >
+          <Text
+            style={{
+              fontSize: 20,
+              fontFamily: "Roboto",
+              color: "white",
+            }}
+          >
+            Đổi mật khẩu
+          </Text>
+        </Pressable>
+      </View>
 
       <Pressable
         style={{
-          backgroundColor: "#0573ff",
+          backgroundColor: COLORS.red,
           padding: 10,
           borderRadius: 5,
           marginHorizontal: 20,
