@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { MessageAPI } from "../services/api";
+import { FriendAPI } from "../services/FriendApi";
 import { getUserCurrent } from "../utils/AsyncStorage";
 
 const AddFriend = ({ navigation }) => {
@@ -45,7 +45,7 @@ const AddFriend = ({ navigation }) => {
       return;
     }
     searchTimeoutRef.current = setTimeout(async () => {
-      const res = await MessageAPI.findUserByPhone(textSearch);
+      const res = await ChatAPI.findUserByPhone(textSearch);
       console.log("res: ", res.data);
       setSearchResult(res.data);
       setSearched(true);
@@ -61,14 +61,14 @@ const AddFriend = ({ navigation }) => {
   // tìm ngay lập tức
   const handleSearch = async () => {
     setSearched(false);
-    const res = await MessageAPI.findUserByPhone(textSearch);
+    const res = await FriendAPI.findUserByPhone(textSearch);
     setSearchResult(res.data);
     setSearched(true);
   };
 
   //xử lý gửi lời mời kết bạn
   const handleAddFriend = async (receiverId) => {
-    const res = await MessageAPI.sendFriendRequest(userCurrent.id, receiverId);
+    const res = await FriendAPI.sendFriendRequest(userCurrent.id, receiverId);
     console.log("res: ", res.data);
     if (res.data.message.includes("successfully"))
       // thay đổi thành nút đã gửi

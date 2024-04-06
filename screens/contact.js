@@ -78,7 +78,7 @@ export default function Contact({ navigation }) {
   // }, []);
 
   // const fetchListFriend = async () => {
-  //   const res = await MessageAPI.getListFriends();
+  //   const res = await FriendAPI.getListFriends();
   //   console.log("res", res.data);
   //   setFriends(res.data);
   // };

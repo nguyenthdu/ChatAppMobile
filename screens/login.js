@@ -12,7 +12,7 @@ import {
 import Loading from "../components/Loading/Loading";
 import PressableCustom from "../components/Pressable/PressableCustom";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { AuthAPI } from "../services/api";
+import { AuthAPI } from "../services/AuthApi";
 import { storeCurrentUser, storeTokens } from "../utils/AsyncStorage";
 export default function Login({ navigation }) {
   const [loading, setLoading] = useState(false);

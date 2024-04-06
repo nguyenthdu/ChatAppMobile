@@ -2,15 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Modal,
 } from "react-native";
-import { MessageAPI } from "../services/api";
 import ChatHeader from "../components/UiChat/chatHeader";
 import MessageInput from "../components/UiChat/messageInput";
+import { ChatAPI } from "../services/ChatApi";
 import useSocket from "../services/useSocket";
 import { getUserCurrent } from "../utils/AsyncStorage";
 
@@ -45,7 +45,7 @@ const Chat = ({ route, navigation }) => {
 
   const fetchMessages = async (currentUser) => {
     try {
-      const response = await MessageAPI.getListOneUserMessage(
+      const response = await ChatAPI.getListOneUserMessage(
         currentUser.id,
         recipient.id
       );
@@ -68,6 +68,7 @@ const Chat = ({ route, navigation }) => {
       user: currentUser,
     };
 
+    // gọi method của socket
     sendMessage(newMessageSendServer);
 
     setMessages((prevMessages) => [...prevMessages, newMessageSendServer]);
@@ -83,7 +84,7 @@ const Chat = ({ route, navigation }) => {
   //TODO: xử lý thu hồi tin nhắn
   const handleRecallMessage = async (id) => {
     // try {
-    //   await MessageAPI.removeMessage(id);
+    //   await ChatAPI.removeMessage(id);
     //   setMessages((prevMessages) =>
     //     prevMessages.filter((message) => message.id !== id)
     //   );
