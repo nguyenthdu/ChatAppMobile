@@ -65,7 +65,9 @@ export default function Login({ navigation }) {
     try {
       const response = await AuthAPI.login(textUserName, textPassword);
       console.log("Response: ", response.data);
-      Alert.alert("Thông báo", response.data);
+      if (response.data === "Please verify your email first") {
+        Alert.alert("Thông báo", response.data);
+      }
       // ToastAndroid.show(response.data, ToastAndroid.SHORT);
       // lưu access, refresh token
       const { accessToken, refreshToken } = response.data.tokens;
