@@ -11,6 +11,8 @@ export const AuthAPI = {
       email,
       fullName,
       avatar,
+      is_verify: true,
+      is_admin: true,
     });
   },
 

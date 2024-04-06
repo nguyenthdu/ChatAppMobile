@@ -1,13 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-  Alert,
-  Pressable,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import Loading from "../components/Loading/Loading";
+import PressableCustom from "../components/Pressable/PressableCustom";
 import { NotificationCustom } from "../components/notification/notification";
 import { COLORS, FONTS, SIZES } from "../constants";
 import { AuthAPI } from "../services/api";
@@ -15,6 +10,7 @@ import { AuthAPI } from "../services/api";
 export default function RegisterPassword({ navigation, route }) {
   // Lấy dữ liệu từ màn hình Register
   const { avatar, userName, fullName, email, phone } = route.params;
+  const [loading, setLoading] = useState(false);
 
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isRePasswordFocused, setIsRePasswordFocused] = useState(false);
@@ -53,10 +49,8 @@ export default function RegisterPassword({ navigation, route }) {
   };
 
   const handleRegister = async () => {
-    if (!validatePasswords()) {
-      return;
-    }
-
+    if (!validatePasswords()) return;
+    setLoading(true);
     try {
       const response = await AuthAPI.register(
         userName,
@@ -67,10 +61,13 @@ export default function RegisterPassword({ navigation, route }) {
         avatar
       );
       NotificationCustom.successRegister();
+      Alert.alert("Đăng ký thành công", "Vui lòng đăng nhập để tiếp tục.");
       // Xử lý dữ liệu trả về từ API nếu cần
       console.log(">>> check", response.data);
+      setLoading(false);
       navigation.navigate("Login");
     } catch (error) {
+      setLoading(false);
       // Xử lý lỗi nếu có
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
@@ -252,19 +249,17 @@ export default function RegisterPassword({ navigation, route }) {
       )}
 
       {/* TODO: Đăng nhập thành công truy cập vào trang chủ */}
-      <Pressable
+      <PressableCustom
         onPress={handleRegister}
-        style={{
-          marginTop: 20,
-          height: 48,
-          width: SIZES.width * 0.9,
-          marginHorizontal: SIZES.marginHorizontal,
-          backgroundColor: COLORS.blue,
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: SIZES.padding,
-          alignSelf: "center",
-        }}
+        marginTop={20}
+        height={48}
+        width={SIZES.width * 0.9}
+        marginHorizontal={SIZES.marginHorizontal}
+        backgroundColor={COLORS.blue}
+        justifyContent={"center"} //{} có ngoặc (hoặc không) cũng được
+        alignItems="center"
+        borderRadius={SIZES.padding}
+        alignSelf={"center"}
       >
         <Text
           style={{
@@ -272,9 +267,9 @@ export default function RegisterPassword({ navigation, route }) {
             ...FONTS.h3,
           }}
         >
-          Đăng ký
+          <Loading loading={loading} title={"Đăng ký"} />
         </Text>
-      </Pressable>
+      </PressableCustom>
     </View>
   );
 }

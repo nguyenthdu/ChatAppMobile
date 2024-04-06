@@ -78,7 +78,9 @@ export default function Register({ navigation }) {
     //số điện thoại phải có 10 số và bắt đầu từ 0
     const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
     if (!regex.test(textPhone)) {
-      setPhoneError("Số điện thoại phải có 10 số và bắt đầu từ 0");
+      setPhoneError(
+        "Số điện thoại phải có 10 số và bắt đầu từ 03, 05, 07, 08, 09."
+      );
       return false;
     }
     setPhoneError("");

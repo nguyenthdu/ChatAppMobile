@@ -1,11 +1,11 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Alert,
   Image,
   Pressable,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -13,18 +13,11 @@ import { COLORS, FONTS, SIZES } from "../constants";
 import { MessageAPI } from "../services/api";
 import { getUserCurrent } from "../utils/AsyncStorage";
 
-const data = {
-  id: 1,
-  avatar: "https://i.pravatar.cc/300",
-  name: "Nguyễn Văn A",
-  phone: "0123456789",
-};
-
 const AddFriend = ({ navigation }) => {
   const [textSearch, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [userCurrent, setCurrentUser] = useState();
-  // const [searched, setSearched] = useState(false); // Biến để kiểm tra đã thực hiện tìm kiếm hay chưa
+  const [sendRequest, setSendRequest] = useState(false);
   // sau 1s sẽ gọi API tìm kiếm user theo số điện thoại
   const [searched, setSearched] = useState(false);
   const searchTimeoutRef = useRef(null);
@@ -42,7 +35,7 @@ const AddFriend = ({ navigation }) => {
     }
   };
 
-  // sau 1s thì tự tìm
+  // sau 600ms thì tự tìm
   useEffect(() => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
@@ -53,9 +46,10 @@ const AddFriend = ({ navigation }) => {
     }
     searchTimeoutRef.current = setTimeout(async () => {
       const res = await MessageAPI.findUserByPhone(textSearch);
+      console.log("res: ", res.data);
       setSearchResult(res.data);
       setSearched(true);
-    }, 1000);
+    }, 600);
 
     return () => {
       if (searchTimeoutRef.current) {
@@ -77,9 +71,12 @@ const AddFriend = ({ navigation }) => {
     const res = await MessageAPI.sendFriendRequest(userCurrent.id, receiverId);
     console.log("res: ", res.data);
     if (res.data.message.includes("successfully"))
-      Alert.alert("Thông báo", "Gửi kết bạn thành công.", [
-        { text: "OK", onPress: () => navigation.goBack() },
-      ]);
+      // thay đổi thành nút đã gửi
+      setSendRequest(true);
+    ToastAndroid.show("Gửi kết bạn thành công", ToastAndroid.SHORT);
+    // Alert.alert("Thông báo", "Gửi kết bạn thành công.", [
+    //   { text: "OK", onPress: () => navigation.goBack() },
+    // ]);
   };
 
   return (
@@ -210,19 +207,23 @@ const AddFriend = ({ navigation }) => {
               </View>
               <Pressable
                 style={{
-                  backgroundColor: COLORS.blue,
+                  backgroundColor: sendRequest ? COLORS.gray : COLORS.blue,
                   padding: 10,
                   borderRadius: 10,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <MaterialIcons
-                  name="person-add"
-                  size={24}
-                  color="white"
-                  onPress={() => handleAddFriend(searchResult.id)}
-                />
+                {sendRequest ? (
+                  <Text onPress={() => setSendRequest(false)}>Hủy lời mời</Text>
+                ) : (
+                  <MaterialIcons
+                    name="person-add"
+                    size={24}
+                    color="white"
+                    onPress={() => handleAddFriend(searchResult.id)}
+                  />
+                )}
               </Pressable>
             </View>
           ) : (
@@ -244,7 +245,7 @@ const AddFriend = ({ navigation }) => {
         ></View>
       )}
 
-      <Pressable
+      {/* <Pressable
         style={{
           flexDirection: "row",
           marginHorizontal: SIZES.marginHorizontal,
@@ -259,7 +260,7 @@ const AddFriend = ({ navigation }) => {
       >
         <Text style={{ ...FONTS.body3 }}>Gợi ý</Text>
         <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 };

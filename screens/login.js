@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -8,12 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { NotificationCustom } from "../components/notification/notification";
+import Loading from "../components/Loading/Loading";
+import PressableCustom from "../components/Pressable/PressableCustom";
 import { COLORS, FONTS, SIZES } from "../constants";
 import { AuthAPI } from "../services/api";
 import { storeCurrentUser, storeTokens } from "../utils/AsyncStorage";
-
 export default function Login({ navigation }) {
+  const [loading, setLoading] = useState(false);
+
   // Focus state và hàm setter cho TextInput UserName và password
   const [isUserNameFocused, setIsUserNameFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
@@ -27,14 +30,38 @@ export default function Login({ navigation }) {
   const handlePasswordBlur = () => setIsPasswordFocused(false);
 
   const [textUserName, setUserName] = React.useState("");
+  const [textUserNameError, setUserNameError] = useState("");
   const [textPassword, setPassword] = React.useState("");
+  const [textPasswordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const checkEmptyUserName = () => {
+    if (textUserName === "") {
+      setUserNameError("Vui lòng nhập tài khoản");
+      return false;
+    }
+    setUserNameError("");
+    return true;
+  };
+
+  const checkEmptyPassword = () => {
+    if (textPassword === "") {
+      setPasswordError("Vui lòng nhập mật khẩu");
+      return false;
+    }
+    setPasswordError("");
+    return true;
+  };
 
   const handlePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   const handleLogin = async () => {
+    if (!checkEmptyUserName() || !checkEmptyPassword()) return;
+    // if (loading) return;
+    setLoading(true);
+    console.log("mấy lần: ");
     try {
       const response = await AuthAPI.login(textUserName, textPassword);
       // lưu access, refresh token
@@ -43,15 +70,17 @@ export default function Login({ navigation }) {
       // lưu user current
       const { user } = response.data;
       await storeCurrentUser(user);
-
+      setLoading(false);
       // console.log("Data: ", response.data);
       navigation.navigate("Home");
     } catch (error) {
+      setLoading(false);
       // Xử lý lỗi nếu có
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
-        console.log("Error:", error.response.data);
-        NotificationCustom.errorLogin();
+        console.log("Error:", error.response.data.message);
+        // NotificationCustom.errorLogin();
+        Alert.alert("Đăng nhập không thành công", error.response.data.message);
       }
     }
   };
@@ -127,6 +156,16 @@ export default function Login({ navigation }) {
           marginHorizontal: SIZES.marginHorizontal,
         }}
       />
+      {textUserNameError !== "" && (
+        <Text
+          style={{
+            color: COLORS.red,
+            marginHorizontal: SIZES.marginHorizontal,
+          }}
+        >
+          {textUserNameError}
+        </Text>
+      )}
       {/* TextInput for password */}
       <Text
         style={{
@@ -184,6 +223,16 @@ export default function Login({ navigation }) {
           />
         </TouchableOpacity>
       </View>
+      {textPasswordError !== "" && (
+        <Text
+          style={{
+            color: COLORS.red,
+            marginHorizontal: SIZES.marginHorizontal,
+          }}
+        >
+          {textPasswordError}
+        </Text>
+      )}
 
       <Pressable
         style={{
@@ -202,19 +251,19 @@ export default function Login({ navigation }) {
         </Text>
       </Pressable>
       {/* TODO: Đăng nhập thành công truy cập vào trang chủ */}
-      <Pressable
+      <PressableCustom
+        // title={"Đăng nhập"}
         onPress={handleLogin}
-        style={{
-          marginTop: 20,
-          height: 48,
-          width: SIZES.width * 0.9,
-          marginHorizontal: SIZES.marginHorizontal,
-          backgroundColor: COLORS.blue,
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: SIZES.padding,
-          alignSelf: "center",
-        }}
+        loading={loading}
+        marginTop={20}
+        height={48}
+        width={SIZES.width * 0.9}
+        marginHorizontal={SIZES.marginHorizontal}
+        backgroundColor={COLORS.blue}
+        justifyContent={"center"} //{} có ngoặc (hoặc không) cũng được
+        alignItems="center"
+        borderRadius={SIZES.padding}
+        alignSelf={"center"}
       >
         <Text
           style={{
@@ -222,9 +271,9 @@ export default function Login({ navigation }) {
             ...FONTS.h3,
           }}
         >
-          Đăng nhập
+          <Loading loading={loading} title={"Đăng nhập"} />
         </Text>
-      </Pressable>
+      </PressableCustom>
     </View>
   );
 }
