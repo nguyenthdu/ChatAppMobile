@@ -64,6 +64,9 @@ export default function Login({ navigation }) {
     console.log("mấy lần: ");
     try {
       const response = await AuthAPI.login(textUserName, textPassword);
+      console.log("Response: ", response.data);
+      Alert.alert("Thông báo", response.data);
+      // ToastAndroid.show(response.data, ToastAndroid.SHORT);
       // lưu access, refresh token
       const { accessToken, refreshToken } = response.data.tokens;
       await storeTokens(accessToken, refreshToken);
@@ -78,7 +81,7 @@ export default function Login({ navigation }) {
       // Xử lý lỗi nếu có
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
-        console.log("Error:", error.response.data.message);
+        console.log("Error:", error.response.data);
         // NotificationCustom.errorLogin();
         Alert.alert("Đăng nhập không thành công", error.response.data.message);
       }
