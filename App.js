@@ -1,28 +1,26 @@
 // In App.js in a new project
 
 import * as React from "react";
-import { StatusBar, View } from "react-native";
+import { StatusBar } from "react-native";
 
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer } from "@react-navigation/native";
-import Constants from "expo-constants";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import Test from "./screens/test";
-import Logo from "./screens/logo";
+import AddFriend from "./screens/add_friend";
+import Chat from "./screens/chat";
+import Contact from "./screens/contact";
+import CreateGroup from "./screens/create_group";
+import Explore from "./screens/explore";
+import HomeScreen from "./screens/home";
+import ListFriendsRequest from "./screens/list_friends_request";
 import LoginScreen from "./screens/login";
-import StartScreen from "./screens/start";
+import Logo from "./screens/logo";
+import Profile from "./screens/profile";
 import RegisterScreen from "./screens/register";
 import RegisterPassword from "./screens/register_password";
-import HomeScreen from "./screens/home";
-import Contact from "./screens/contact";
-import Profile from "./screens/profile";
-import Explore from "./screens/explore";
-import Chat from "./screens/chat";
-import AddFriend from "./screens/add_friend";
-import ListFriendsRequest from "./screens/list_friends_request";
-import CreateGroup from "./screens/create_group";
+import StartScreen from "./screens/start";
 const Stack = createNativeStackNavigator();
 
 const Tab = createBottomTabNavigator();
