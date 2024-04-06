@@ -8,10 +8,11 @@ import {
 } from "react-native";
 import { COLORS } from "../../constants";
 import * as ImagePicker from "expo-image-picker";
-
+import * as DocumentPicker from "expo-document-picker";
+import { MaterialIcons } from "@expo/vector-icons";
 const MessageInput = ({ setNewMessage, newMessage, handleSendMessage }) => {
   const [selectedImage, setSelectedImage] = useState(null);
-
+  const [selectedDocument, setSelectedDocument] = useState(null);
   const selectImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -25,12 +26,30 @@ const MessageInput = ({ setNewMessage, newMessage, handleSendMessage }) => {
       setSelectedImage(result.uri);
     }
   };
+  //TODO:  xử lý chọn file
+  const selectDocument = async () => {
+    let result = await DocumentPicker.getDocumentAsync({
+      type: "*/*",
+      copyToCacheDirectory: true,
+      multiple: true,
+    });
+
+    if (result.type !== "cancel") {
+      // Handle the selected document here
+      setSelectedDocument(result.uri);
+      console.log(result.uri);
+    }
+  };
 
   return (
     <View style={styles.inputContainer}>
       <TouchableOpacity onPress={selectImage}>
         <Text style={styles.imageButton}>📷</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={selectDocument}>
+        <Text style={styles.documentButton}>📁</Text>
+      </TouchableOpacity>
+
       <TextInput
         value={newMessage}
         onChangeText={(text) => setNewMessage(text)}
@@ -39,7 +58,7 @@ const MessageInput = ({ setNewMessage, newMessage, handleSendMessage }) => {
         onSubmitEditing={handleSendMessage}
       />
       <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
-        <Text style={{ color: "white", fontWeight: "bold" }}>Gửi</Text>
+        <MaterialIcons name="send" size={24} color="blue" />
       </TouchableOpacity>
 
       {/* Hiển thị hình ảnh đã chọn */}
@@ -69,13 +88,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   sendButton: {
-    backgroundColor: COLORS.blue,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 18,
   },
   imageButton: {
     fontSize: 20,
@@ -85,6 +99,10 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 10,
+  },
+  documentButton: {
+    fontSize: 20,
+    paddingHorizontal: 10,
   },
 });
 
