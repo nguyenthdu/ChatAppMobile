@@ -1,2 +1,2 @@
-export const baseUrl = "http://172.16.11.83:3000";
+export const baseUrl = "http://192.168.102.118:3000";
 export const baseMessage = "message";
