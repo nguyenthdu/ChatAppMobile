@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { NotificationCustom } from "../components/notification/notification";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { MessageAPI } from "../services/api";
+import { FriendAPI } from "../services/FriendApi";
 
 export default function Home({ navigation }) {
   const [isPressAllChat, setIsPressAllChat] = React.useState(true);
@@ -37,7 +37,7 @@ export default function Home({ navigation }) {
 
   const fetchListUserMessage = async () => {
     try {
-      const res = await MessageAPI.getListUserMessage();
+      const res = await FriendAPI.getListUserMessage();
       console.log("List user message:", res.data);
       setData(res.data);
     } catch (error) {

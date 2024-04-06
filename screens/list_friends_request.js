@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Alert, FlatList, Image, Pressable, Text, View } from "react-native";
 import { COLORS, SIZES } from "../constants";
-import { MessageAPI } from "../services/api";
+import { FriendAPI } from "../services/FriendApi";
 
 export default function ListFriendsRequest({ navigation }) {
   const [listFriendRequest, setListFriendRequest] = useState([]);
@@ -11,7 +11,7 @@ export default function ListFriendsRequest({ navigation }) {
   }, []);
 
   const fetchListFriendRequestPending = async () => {
-    const res = await MessageAPI.getListFriendRequestPending();
+    const res = await FriendAPI.getListFriendRequestPending();
     setListFriendRequest(res.data);
     // console.log("res request: ", res.data);
   };
@@ -19,7 +19,7 @@ export default function ListFriendsRequest({ navigation }) {
   // Xử lý chấp nhận lời mời kết bạn
   const handleAccept = (user) => {
     const acceptFriendRequest = async () => {
-      const res = await MessageAPI.acceptFriendRequest(user?.id);
+      const res = await FriendAPI.acceptFriendRequest(user?.id);
       if (res?.data.message.includes("successfully")) {
         console.log("res", res?.data);
         fetchListFriendRequestPending();

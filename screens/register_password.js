@@ -5,7 +5,7 @@ import Loading from "../components/Loading/Loading";
 import PressableCustom from "../components/Pressable/PressableCustom";
 import { NotificationCustom } from "../components/notification/notification";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { AuthAPI } from "../services/api";
+import { AuthAPI } from "../services/AuthApi";
 
 export default function RegisterPassword({ navigation, route }) {
   // Lấy dữ liệu từ màn hình Register

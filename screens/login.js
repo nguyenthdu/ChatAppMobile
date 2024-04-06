@@ -12,7 +12,7 @@ import {
 import Loading from "../components/Loading/Loading";
 import PressableCustom from "../components/Pressable/PressableCustom";
 import { COLORS, FONTS, SIZES } from "../constants";
-import { AuthAPI } from "../services/api";
+import { AuthAPI } from "../services/AuthApi";
 import { storeCurrentUser, storeTokens } from "../utils/AsyncStorage";
 export default function Login({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -64,6 +64,11 @@ export default function Login({ navigation }) {
     console.log("mấy lần: ");
     try {
       const response = await AuthAPI.login(textUserName, textPassword);
+      console.log("Response: ", response.data);
+      if (response.data === "Please verify your email first") {
+        Alert.alert("Thông báo", response.data);
+      }
+      // ToastAndroid.show(response.data, ToastAndroid.SHORT);
       // lưu access, refresh token
       const { accessToken, refreshToken } = response.data.tokens;
       await storeTokens(accessToken, refreshToken);
@@ -78,7 +83,7 @@ export default function Login({ navigation }) {
       // Xử lý lỗi nếu có
       if (error.response) {
         // Request được gửi đi và máy chủ trả về mã lỗi
-        console.log("Error:", error.response.data.message);
+        console.log("Error:", error.response.data);
         // NotificationCustom.errorLogin();
         Alert.alert("Đăng nhập không thành công", error.response.data.message);
       }
