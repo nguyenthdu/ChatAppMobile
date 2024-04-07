@@ -10,15 +10,15 @@ import {
 } from "react-native";
 
 const ImageViewModal = ({ visible, imageUri, onClose }) => {
-  //kiểm tra xem là ảnh hay video
-  const isVideo = imageUri.endsWith(".mp4");
-  if (isVideo) {
-    return (
-      <Modal animationType="slide" visible={visible} transparent={true}>
-        <View style={styles.modalContainer}>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Đóng</Text>
-          </TouchableOpacity>
+  const isVideo = imageUri.toLowerCase().endsWith(".mp4"); // Chuyển đổi phần mở rộng thành chữ thường trước khi kiểm tra
+
+  return (
+    <Modal animationType="slide" visible={visible} transparent={true}>
+      <View style={styles.modalContainer}>
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <Text style={styles.closeButtonText}>Đóng</Text>
+        </TouchableOpacity>
+        {isVideo ? ( // Kiểm tra xem có phải là video hay không
           <Video
             source={{ uri: imageUri }}
             rate={1.0}
@@ -27,20 +27,11 @@ const ImageViewModal = ({ visible, imageUri, onClose }) => {
             resizeMode="cover"
             shouldPlay
             isLooping
-            style={styles.modalImage}
+            style={styles.media}
           />
-        </View>
-      </Modal>
-    );
-  }
-
-  return (
-    <Modal animationType="slide" visible={visible} transparent={true}>
-      <View style={styles.modalContainer}>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-          <Text style={styles.closeButtonText}>Đóng</Text>
-        </TouchableOpacity>
-        <Image source={{ uri: imageUri }} style={styles.modalImage} />
+        ) : (
+          <Image source={{ uri: imageUri }} style={styles.modalImage} />
+        )}
       </View>
     </Modal>
   );
@@ -71,5 +62,13 @@ const styles = StyleSheet.create({
     width: 300,
     resizeMode: "contain",
     borderRadius: 10,
+  },
+  media: {
+    width: "100%", // Đảm bảo rằng nội dung điều chỉnh theo chiều ngang của phần tử cha
+    height: "auto", // Tự động tính toán chiều cao dựa trên tỷ lệ chiều rộng
+    aspectRatio: 16 / 9, // Giữ tỷ lệ khung hình của nội dung, bạn có thể điều chỉnh theo ý muốn
+    resizeMode: "contain", // Hiển thị nội dung mà không làm biến dạng
+    borderRadius: 10,
+    marginBottom: 10,
   },
 });

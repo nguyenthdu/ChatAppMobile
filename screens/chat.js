@@ -109,7 +109,7 @@ const Chat = ({ route, navigation }) => {
 
   // kiểm tra xem link có phải là ảnh không
   const isImageLink = (text) => {
-    return text.match(/\.(jpeg|jpg|gif|png)$/) != null;
+    return text.match(/\.(jpeg|jpg|gif|png|mp4)$/) != null;
   };
 
   // check link có phải file không
