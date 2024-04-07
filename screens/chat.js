@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import CardFile from "../components/CardFile/CardFile";
+import CardImage from "../components/CardImage/CardImage";
+import ImageViewModal from "../components/ImageViewDetail/ImageViewModal";
 import ChatHeader from "../components/UiChat/chatHeader";
 import MessageInput from "../components/UiChat/messageInput";
 import { ChatAPI } from "../services/ChatApi";
@@ -22,8 +25,15 @@ const Chat = ({ route, navigation }) => {
   const flatListRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [messageId, setMessageId] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const { sendMessage } = useSocket({ setMessages });
+
+  const toggleModal = (imageUri) => {
+    setSelectedImage(imageUri);
+    setIsModalVisible(!isModalVisible);
+  };
 
   const scrollBottom = () => {
     flatListRef.current.scrollToEnd({ animated: false });
@@ -95,6 +105,16 @@ const Chat = ({ route, navigation }) => {
     console.log("Thu hồi tin nhắn", id);
   };
 
+  // kiểm tra xem link có phải là ảnh không
+  const isImageLink = (text) => {
+    return text.match(/\.(jpeg|jpg|gif|png)$/) != null;
+  };
+
+  // check link có phải file không
+  const isFileLink = (text) => {
+    return text.match(/\.(txt|pdf|doc|docx|xls|xlsx|ppt|pptx)$/) != null;
+  };
+
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <ChatHeader recipient={recipient} navigation={navigation} />
@@ -104,24 +124,71 @@ const Chat = ({ route, navigation }) => {
           onContentSizeChange={scrollBottom}
           data={messages}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onLongPress={() => handleOpenModal(item)}
-              style={[
-                styles.messageContainer,
-                item.recipientId === recipient.id
-                  ? styles.otherMessage
-                  : styles.myMessage,
-              ]}
-            >
-              <Text style={styles.messageText}>{item.text}</Text>
-            </TouchableOpacity>
-          )}
+          renderItem={({ item }) => {
+            if (isImageLink(item.text)) {
+              return (
+                <TouchableOpacity
+                  onLongPress={() => handleOpenModal(item)}
+                  style={[
+                    styles.messageContainer,
+                    {
+                      alignSelf:
+                        item.recipientId === recipient.id
+                          ? "flex-end"
+                          : "flex-start",
+                    },
+                  ]}
+                >
+                  <TouchableOpacity onPress={() => toggleModal(item.text)}>
+                    <CardImage imageUrl={item.text} />
+                    {/**<Image
+                      source={{ uri: item.text }}
+                      style={styles.messageImage}
+                />*/}
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              );
+            } else if (isFileLink(item.text)) {
+              return (
+                <TouchableOpacity
+                  onLongPress={() => handleOpenModal(item)}
+                  style={[
+                    styles.messageContainer,
+                    {
+                      alignSelf:
+                        item.recipientId === recipient.id
+                          ? "flex-end"
+                          : "flex-start",
+                    },
+                  ]}
+                >
+                  <CardFile fileName={item.text} />
+                </TouchableOpacity>
+              );
+            } else {
+              return (
+                <TouchableOpacity
+                  onLongPress={() => handleOpenModal(item)}
+                  style={[
+                    styles.messageContainer,
+                    item.recipientId === recipient.id
+                      ? styles.otherMessage
+                      : styles.myMessage,
+                  ]}
+                >
+                  <Text style={styles.messageText}>{item.text}</Text>
+                </TouchableOpacity>
+              );
+            }
+          }}
         />
+
         <MessageInput
           handleSendMessage={handleSendMessage}
           setNewMessage={setNewMessage}
           newMessage={newMessage}
+          currentUser={currentUser}
+          recipient={recipient}
         />
       </View>
       <Modal
@@ -170,6 +237,11 @@ const Chat = ({ route, navigation }) => {
           </View>
         </View>
       </Modal>
+      <ImageViewModal
+        visible={isModalVisible}
+        imageUri={selectedImage ? selectedImage : ""}
+        onClose={toggleModal}
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -191,6 +263,12 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 18,
+  },
+  messageImage: {
+    width: 100,
+    height: 200,
+    objectFit: "contain",
+    borderRadius: 10,
   },
 });
 

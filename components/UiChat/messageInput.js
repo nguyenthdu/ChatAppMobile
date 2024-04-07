@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,14 +9,28 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { COLORS } from "../../constants";
-import * as ImagePicker from "expo-image-picker";
-import * as DocumentPicker from "expo-document-picker";
-import { MaterialIcons } from "@expo/vector-icons";
-const MessageInput = ({ setNewMessage, newMessage, handleSendMessage }) => {
+import { UploadAPI } from "../../services/UserApi";
+import CardFile from "../CardFile/CardFile";
+import CardImage from "../CardImage/CardImage";
+import ImageViewModal from "../ImageViewDetail/ImageViewModal";
+
+const MessageInput = ({
+  setNewMessage,
+  newMessage,
+  handleSendMessage,
+  currentUser,
+  recipient,
+}) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
-  const selectImage = async () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    console.log("messages: ", newMessage);
+  }, [newMessage]);
+
+  const handleUploadImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       // allowsEditing: true,
@@ -21,11 +38,29 @@ const MessageInput = ({ setNewMessage, newMessage, handleSendMessage }) => {
       aspect: [4, 3],
       quality: 1,
     });
+    if (!result.canceled && result.assets) {
+      setSelectedImage(result.assets);
+      setLoading(true);
 
-    if (!result.cancelled) {
-      setSelectedImage(result.uri);
+      const res = await UploadAPI.uploadImage(result.assets);
+      console.log("res: ", res.data);
+      if (res?.data?.imageUrl) {
+        setNewMessage(res.data.imageUrl);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        console.error("Error uploading image:", res);
+      }
+    } else {
+      setLoading(false);
+      console.log("Image selection cancelled or result.assets undefined");
     }
   };
+
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
   //TODO:  xử lý chọn file
   const selectDocument = async () => {
     let result = await DocumentPicker.getDocumentAsync({
@@ -34,38 +69,103 @@ const MessageInput = ({ setNewMessage, newMessage, handleSendMessage }) => {
       multiple: true,
     });
 
-    if (result.type !== "cancel") {
-      // Handle the selected document here
-      setSelectedDocument(result.uri);
-      console.log(result.uri);
+    if (!result.canceled && result.assets) {
+      setSelectedDocument(result.assets);
+      console.log("result: ", result.assets[0]);
+      setLoading(true);
+
+      const res = await UploadAPI.uploadDocument(
+        result.assets,
+        currentUser.id,
+        recipient.id
+      );
+      console.log("res: ", res.data);
+      if (res?.data) {
+        setNewMessage(res.data[0]);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        console.error("Error uploading document:", res);
+      }
+    } else {
+      setLoading(false);
+      console.log("Document selection cancelled or result.assets undefined");
     }
   };
 
   return (
-    <View style={styles.inputContainer}>
-      <TouchableOpacity onPress={selectImage}>
-        <Text style={styles.imageButton}>📷</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={selectDocument}>
-        <Text style={styles.documentButton}>📁</Text>
-      </TouchableOpacity>
-
-      <TextInput
-        value={newMessage}
-        onChangeText={(text) => setNewMessage(text)}
-        style={styles.input}
-        placeholder="Tin nhắn"
-        onSubmitEditing={handleSendMessage}
-      />
-      <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
-        <MaterialIcons name="send" size={24} color="blue" />
-      </TouchableOpacity>
-
+    <>
       {/* Hiển thị hình ảnh đã chọn */}
-      {selectedImage && (
-        <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : (
+        <>
+          {selectedImage && (
+            <View style={styles.selectedImageContainer}>
+              <TouchableOpacity onPress={toggleModal}>
+                <CardImage imageUrl={selectedImage[0].uri} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteImageButton}
+                onPress={() => setSelectedImage(null)}
+              >
+                <MaterialIcons name="cancel" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {selectedDocument && (
+            <View style={styles.selectedImageContainer}>
+              <TouchableOpacity onPress={toggleModal}>
+                <CardFile fileName={selectedDocument[0].name} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteImageButton}
+                onPress={() => setSelectedDocument(null)}
+              >
+                <MaterialIcons name="cancel" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </>
       )}
-    </View>
+      <View style={styles.inputContainer}>
+        <TouchableOpacity onPress={handleUploadImage}>
+          <Text style={styles.imageButton}>📷</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={selectDocument}>
+          <Text style={styles.documentButton}>📁</Text>
+        </TouchableOpacity>
+        <TextInput
+          value={newMessage.startsWith("http") ? "" : newMessage}
+          onChangeText={(text) => setNewMessage(text)}
+          style={styles.input}
+          placeholder="Tin nhắn"
+          onSubmitEditing={() => {
+            handleSendMessage();
+            setSelectedImage(null);
+            setSelectedDocument(null);
+          }}
+        />
+        <TouchableOpacity
+          disabled={loading}
+          onPress={() => {
+            handleSendMessage();
+            setSelectedImage(null);
+            setSelectedDocument(null);
+          }}
+          style={styles.sendButton}
+        >
+          <MaterialIcons name="send" size={24} color="blue" />
+        </TouchableOpacity>
+      </View>
+
+      <ImageViewModal
+        visible={isModalVisible}
+        imageUri={selectedImage ? selectedImage[0].uri : ""}
+        onClose={toggleModal}
+      />
+    </>
   );
 };
 
@@ -96,13 +196,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   selectedImage: {
-    width: 50,
-    height: 50,
+    height: 100,
+    width: 100,
+    padding: 10,
     borderRadius: 10,
   },
   documentButton: {
     fontSize: 20,
     paddingHorizontal: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    fontSize: 16,
+  },
+  modalImage: {
+    height: "80%",
+    width: 300,
+    resizeMode: "contain",
+    borderRadius: 10,
+  },
+  selectedImageContainer: {
+    flexDirection: "row",
+    backgroundColor: "#F5F5F5",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginBottom: 10,
+  },
+  deleteImageButton: {
+    marginLeft: -10,
+    marginTop: -10,
   },
 });
 

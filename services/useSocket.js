@@ -4,6 +4,7 @@ import { getTokens } from "../utils/AsyncStorage";
 import { baseMessage, baseUrl } from "../utils/containUrl";
 
 const useSocket = (props) => {
+  // đáng nhẽ phải là messages
   const { setMessages } = props;
   const [token, setToken] = useState("");
   const [socket, setSocket] = useState(null);

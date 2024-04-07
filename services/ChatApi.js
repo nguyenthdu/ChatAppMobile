@@ -5,3 +5,5 @@ export const ChatAPI = {
     return axios.get(`/messages/${currentUserId}/${recipientId}`);
   },
 };
+
+export const chatGroupAPI = {};
