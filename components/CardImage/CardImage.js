@@ -4,7 +4,10 @@ import { Image, StyleSheet, View } from "react-native";
 const CardImage = ({ imageUrl }) => {
   return (
     <View style={styles.card}>
-      <Image source={{ uri: imageUrl }} style={styles.image} />
+      <Image
+        source={{ uri: imageUrl }}
+        style={imageUrl.startsWith("http") ? styles.imageLink : styles.image}
+      />
     </View>
   );
 };
@@ -30,6 +33,15 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     resizeMode: "cover",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  // hiện kích thước thật của ảnh
+  imageLink: {
+    width: "100%",
+    height: "auto",
+    aspectRatio: 1, // Giữ tỷ lệ khung hình của ảnh
+    resizeMode: "contain",
     borderRadius: 10,
     marginBottom: 10,
   },

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
-  Image,
   KeyboardAvoidingView,
   Modal,
   StyleSheet,
@@ -9,6 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import CardFile from "../components/CardFile/CardFile";
+import CardImage from "../components/CardImage/CardImage";
 import ImageViewModal from "../components/ImageViewDetail/ImageViewModal";
 import ChatHeader from "../components/UiChat/chatHeader";
 import MessageInput from "../components/UiChat/messageInput";
@@ -109,6 +110,11 @@ const Chat = ({ route, navigation }) => {
     return text.match(/\.(jpeg|jpg|gif|png)$/) != null;
   };
 
+  // check link có phải file không
+  const isFileLink = (text) => {
+    return text.match(/\.(txt|pdf|doc|docx|xls|xlsx|ppt|pptx)$/) != null;
+  };
+
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <ChatHeader recipient={recipient} navigation={navigation} />
@@ -118,42 +124,63 @@ const Chat = ({ route, navigation }) => {
           onContentSizeChange={scrollBottom}
           data={messages}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) =>
-            isImageLink(item.text) ? (
-              <TouchableOpacity
-                onLongPress={() => handleOpenModal(item)}
-                style={[
-                  styles.messageContainer,
-                  {
-                    // backgroundColor: "pink",
-                    alignSelf:
-                      item.recipientId === recipient.id
-                        ? "flex-end"
-                        : "flex-start",
-                  },
-                ]}
-              >
-                <TouchableOpacity onPress={() => toggleModal(item.text)}>
-                  <Image
-                    source={{ uri: item.text }}
-                    style={styles.messageImage}
-                  />
+          renderItem={({ item }) => {
+            if (isImageLink(item.text)) {
+              return (
+                <TouchableOpacity
+                  onLongPress={() => handleOpenModal(item)}
+                  style={[
+                    styles.messageContainer,
+                    {
+                      alignSelf:
+                        item.recipientId === recipient.id
+                          ? "flex-end"
+                          : "flex-start",
+                    },
+                  ]}
+                >
+                  <TouchableOpacity onPress={() => toggleModal(item.text)}>
+                    <CardImage imageUrl={item.text} />
+                    {/**<Image
+                      source={{ uri: item.text }}
+                      style={styles.messageImage}
+                />*/}
+                  </TouchableOpacity>
                 </TouchableOpacity>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                onLongPress={() => handleOpenModal(item)}
-                style={[
-                  styles.messageContainer,
-                  item.recipientId === recipient.id
-                    ? styles.otherMessage
-                    : styles.myMessage,
-                ]}
-              >
-                <Text style={styles.messageText}>{item.text}</Text>
-              </TouchableOpacity>
-            )
-          }
+              );
+            } else if (isFileLink(item.text)) {
+              return (
+                <TouchableOpacity
+                  onLongPress={() => handleOpenModal(item)}
+                  style={[
+                    styles.messageContainer,
+                    {
+                      alignSelf:
+                        item.recipientId === recipient.id
+                          ? "flex-end"
+                          : "flex-start",
+                    },
+                  ]}
+                >
+                  <CardFile fileName={item.text} />
+                </TouchableOpacity>
+              );
+            } else {
+              return (
+                <TouchableOpacity
+                  onLongPress={() => handleOpenModal(item)}
+                  style={[
+                    styles.messageContainer,
+                    item.recipientId === recipient.id
+                      ? styles.otherMessage
+                      : styles.myMessage,
+                  ]}
+                >
+                  <Text style={styles.messageText}>{item.text}</Text>
+                </TouchableOpacity>
+              );
+            }
+          }}
         />
 
         <MessageInput

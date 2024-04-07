@@ -144,6 +144,7 @@ const MessageInput = ({
           onSubmitEditing={() => {
             handleSendMessage();
             setSelectedImage(null);
+            setSelectedDocument(null);
           }}
         />
         <TouchableOpacity
@@ -151,6 +152,7 @@ const MessageInput = ({
           onPress={() => {
             handleSendMessage();
             setSelectedImage(null);
+            setSelectedDocument(null);
           }}
           style={styles.sendButton}
         >
