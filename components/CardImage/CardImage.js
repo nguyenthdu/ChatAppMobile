@@ -1,7 +1,27 @@
 import React from "react";
 import { Image, StyleSheet, View } from "react-native";
-
+import { Video } from "expo-av";
 const CardImage = ({ imageUrl }) => {
+  // Kiểm tra là link video hay ảnh
+  const isVideo = imageUrl.endsWith(".mp4");
+  if (isVideo) {
+    console.log("link video: ", imageUrl);
+    return (
+      <View style={styles.card}>
+        <Video
+          source={{ uri: imageUrl }}
+          rate={1.0}
+          volume={1.0}
+          isMuted={false}
+          resizeMode="cover"
+          shouldPlay
+          isLooping
+          style={styles.image}
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.card}>
       <Image
