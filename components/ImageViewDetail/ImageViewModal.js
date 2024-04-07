@@ -7,8 +7,33 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Video } from "expo-av";
 
 const ImageViewModal = ({ visible, imageUri, onClose }) => {
+  //kiểm tra xem là ảnh hay video
+  const isVideo = imageUri.endsWith(".mp4");
+  if (isVideo) {
+    return (
+      <Modal animationType="slide" visible={visible} transparent={true}>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Text style={styles.closeButtonText}>Đóng</Text>
+          </TouchableOpacity>
+          <Video
+            source={{ uri: imageUri }}
+            rate={1.0}
+            volume={1.0}
+            isMuted={false}
+            resizeMode="cover"
+            shouldPlay
+            isLooping
+            style={styles.modalImage}
+          />
+        </View>
+      </Modal>
+    );
+  }
+
   return (
     <Modal animationType="slide" visible={visible} transparent={true}>
       <View style={styles.modalContainer}>
