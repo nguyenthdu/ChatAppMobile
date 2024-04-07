@@ -30,14 +30,14 @@ export const UploadAPI = {
   uploadDocument: async (document, userId, recipientId) => {
     try {
       let formData = new FormData();
-      formData.append("document", {
+      formData.append("image", {
         uri: document[0].uri,
         name: document[0].name,
-        type: document[0].type,
+        type: document[0].mimeType,
       });
       formData.append("userId", userId);
       formData.append("recipientId", recipientId);
-      formData.append("created_at", new Date());
+      formData.append("created_at", new Date().toString());
 
       const response = await axios.post("/messages/uploadFile", formData, {
         headers: {

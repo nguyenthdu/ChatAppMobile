@@ -3,7 +3,6 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
-  Image,
   StyleSheet,
   Text,
   TextInput,
@@ -11,6 +10,8 @@ import {
   View,
 } from "react-native";
 import { UploadAPI } from "../../services/UserApi";
+import CardFile from "../CardFile/CardFile";
+import CardImage from "../CardImage/CardImage";
 import ImageViewModal from "../ImageViewDetail/ImageViewModal";
 
 const MessageInput = ({
@@ -78,9 +79,9 @@ const MessageInput = ({
         currentUser.id,
         recipient.id
       );
-      console.log("res: ", res);
+      console.log("res: ", res.data);
       if (res?.data) {
-        setNewMessage(res.data.imageUrl);
+        setNewMessage(res.data[0]);
         setLoading(false);
       } else {
         setLoading(false);
@@ -95,21 +96,38 @@ const MessageInput = ({
   return (
     <>
       {/* Hiển thị hình ảnh đã chọn */}
-      {selectedImage && (
-        <View style={styles.selectedImageContainer}>
-          <TouchableOpacity onPress={toggleModal}>
-            <Image
-              source={{ uri: selectedImage[0].uri }}
-              style={styles.selectedImage}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.deleteImageButton}
-            onPress={() => setSelectedImage(null)}
-          >
-            <MaterialIcons name="cancel" size={24} color="red" />
-          </TouchableOpacity>
-        </View>
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : (
+        <>
+          {selectedImage && (
+            <View style={styles.selectedImageContainer}>
+              <TouchableOpacity onPress={toggleModal}>
+                <CardImage imageUrl={selectedImage[0].uri} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteImageButton}
+                onPress={() => setSelectedImage(null)}
+              >
+                <MaterialIcons name="cancel" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {selectedDocument && (
+            <View style={styles.selectedImageContainer}>
+              <TouchableOpacity onPress={toggleModal}>
+                <CardFile fileName={selectedDocument[0].name} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteImageButton}
+                onPress={() => setSelectedDocument(null)}
+              >
+                <MaterialIcons name="cancel" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </>
       )}
       <View style={styles.inputContainer}>
         <TouchableOpacity onPress={handleUploadImage}>
