@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 const ImageViewModal = ({ visible, imageUri, onClose }) => {
+  console.log("imageUri", imageUri);
   return (
     <Modal animationType="slide" visible={visible} transparent={true}>
       <View style={styles.modalContainer}>
