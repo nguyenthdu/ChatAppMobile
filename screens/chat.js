@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Modal,
   StyleSheet,
@@ -8,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import ImageViewModal from "../components/ImageViewDetail/ImageViewModal";
 import ChatHeader from "../components/UiChat/chatHeader";
 import MessageInput from "../components/UiChat/messageInput";
 import { ChatAPI } from "../services/ChatApi";
@@ -22,8 +24,15 @@ const Chat = ({ route, navigation }) => {
   const flatListRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [messageId, setMessageId] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const { sendMessage } = useSocket({ setMessages });
+
+  const toggleModal = (imageUri) => {
+    setSelectedImage(imageUri);
+    setIsModalVisible(!isModalVisible);
+  };
 
   const scrollBottom = () => {
     flatListRef.current.scrollToEnd({ animated: false });
@@ -95,6 +104,11 @@ const Chat = ({ route, navigation }) => {
     console.log("Thu hồi tin nhắn", id);
   };
 
+  // kiểm tra xem link có phải là ảnh không
+  const isImageLink = (text) => {
+    return text.match(/\.(jpeg|jpg|gif|png)$/) != null;
+  };
+
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <ChatHeader recipient={recipient} navigation={navigation} />
@@ -104,24 +118,50 @@ const Chat = ({ route, navigation }) => {
           onContentSizeChange={scrollBottom}
           data={messages}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onLongPress={() => handleOpenModal(item)}
-              style={[
-                styles.messageContainer,
-                item.recipientId === recipient.id
-                  ? styles.otherMessage
-                  : styles.myMessage,
-              ]}
-            >
-              <Text style={styles.messageText}>{item.text}</Text>
-            </TouchableOpacity>
-          )}
+          renderItem={({ item }) =>
+            isImageLink(item.text) ? (
+              <TouchableOpacity
+                onLongPress={() => handleOpenModal(item)}
+                style={[
+                  styles.messageContainer,
+                  {
+                    // backgroundColor: "pink",
+                    alignSelf:
+                      item.recipientId === recipient.id
+                        ? "flex-end"
+                        : "flex-start",
+                  },
+                ]}
+              >
+                <TouchableOpacity onPress={() => toggleModal(item.text)}>
+                  <Image
+                    source={{ uri: item.text }}
+                    style={styles.messageImage}
+                  />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onLongPress={() => handleOpenModal(item)}
+                style={[
+                  styles.messageContainer,
+                  item.recipientId === recipient.id
+                    ? styles.otherMessage
+                    : styles.myMessage,
+                ]}
+              >
+                <Text style={styles.messageText}>{item.text}</Text>
+              </TouchableOpacity>
+            )
+          }
         />
+
         <MessageInput
           handleSendMessage={handleSendMessage}
           setNewMessage={setNewMessage}
           newMessage={newMessage}
+          currentUser={currentUser}
+          recipient={recipient}
         />
       </View>
       <Modal
@@ -170,6 +210,11 @@ const Chat = ({ route, navigation }) => {
           </View>
         </View>
       </Modal>
+      <ImageViewModal
+        visible={isModalVisible}
+        imageUri={selectedImage ? selectedImage : ""}
+        onClose={toggleModal}
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -191,6 +236,12 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 18,
+  },
+  messageImage: {
+    width: 100,
+    height: 200,
+    objectFit: "contain",
+    borderRadius: 10,
   },
 });
 
