@@ -22,14 +22,14 @@ const MessageInput = ({
   currentUser,
   recipient,
 }) => {
+  const { messages, setMessages } = useChatContext();
+
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { messages, setMessages } = useChatContext();
-
-  const handleUploadImage = async () => {
+  const handleSelectedImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       // allowsEditing: true,
@@ -39,10 +39,16 @@ const MessageInput = ({
     });
     if (!result.canceled && result.assets) {
       setSelectedImage(result.assets);
-      setLoading(true);
+    } else {
+      console.log("Image selection cancelled or result.assets undefined");
+    }
+  };
 
+  const handleUploadFile = async (type) => {
+    setLoading(true);
+    if (type === "image") {
       const res = await UploadAPI.uploadImage(
-        result.assets,
+        selectedImage,
         currentUser.id,
         recipient.id
       );
@@ -61,13 +67,21 @@ const MessageInput = ({
         });
         setMessages([...messages, ...newMessageSendServer]);
         setLoading(false);
+        setSelectedImage(null);
       } else {
         setLoading(false);
         console.error("Error uploading image:", res);
       }
+    }
+  };
+
+  const handleSend = () => {
+    if (selectedImage) {
+      handleUploadFile("image");
+    } else if (selectedDocument) {
+      handleUploadFile("document");
     } else {
-      setLoading(false);
-      console.log("Image selection cancelled or result.assets undefined");
+      handleSendMessage();
     }
   };
 
@@ -144,7 +158,7 @@ const MessageInput = ({
         </>
       )}
       <View style={styles.inputContainer}>
-        <TouchableOpacity onPress={handleUploadImage}>
+        <TouchableOpacity onPress={handleSelectedImage}>
           <Text style={styles.imageButton}>📷</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={selectDocument}>
@@ -155,19 +169,11 @@ const MessageInput = ({
           onChangeText={(text) => setNewMessage(text)}
           style={styles.input}
           placeholder="Tin nhắn"
-          onSubmitEditing={() => {
-            handleSendMessage();
-            setSelectedImage(null);
-            setSelectedDocument(null);
-          }}
+          onSubmitEditing={() => handleSend()}
         />
         <TouchableOpacity
           disabled={loading}
-          onPress={() => {
-            handleSendMessage();
-            setSelectedImage(null);
-            setSelectedDocument(null);
-          }}
+          onPress={() => handleSend()}
           style={styles.sendButton}
         >
           <MaterialIcons name="send" size={24} color="blue" />
