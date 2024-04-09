@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useChatContext } from "../../hooks/AppProvider";
 import { UploadAPI } from "../../services/UserApi";
 import CardFile from "../CardFile/CardFile";
 import CardImage from "../CardImage/CardImage";
@@ -26,9 +27,7 @@ const MessageInput = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    console.log("messages: ", newMessage);
-  }, [newMessage]);
+  const { messages, setMessages } = useChatContext();
 
   const handleUploadImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -42,10 +41,25 @@ const MessageInput = ({
       setSelectedImage(result.assets);
       setLoading(true);
 
-      const res = await UploadAPI.uploadImage(result.assets);
+      const res = await UploadAPI.uploadImage(
+        result.assets,
+        currentUser.id,
+        recipient.id
+      );
       console.log("res: ", res.data);
-      if (res?.data?.imageUrl) {
-        setNewMessage(res.data.imageUrl);
+      if (res?.data) {
+        const newMessageSendServer = [];
+        res.data.forEach((url) => {
+          const messageNew = {
+            text: url,
+            userId: currentUser.id,
+            recipientId: recipient.id,
+            created_at: new Date(),
+            user: currentUser,
+          };
+          newMessageSendServer.push(messageNew);
+        });
+        setMessages([...messages, ...newMessageSendServer]);
         setLoading(false);
       } else {
         setLoading(false);

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import { useChatContext } from "../hooks/AppProvider";
 import { getTokens } from "../utils/AsyncStorage";
 import { baseMessage, baseUrl } from "../utils/containUrl";
 
 const useSocket = (props) => {
-  // đáng nhẽ phải là messages
-  const { setMessages, messages } = props;
+  const { messages, setMessages } = useChatContext();
   const [token, setToken] = useState("");
   const [socket, setSocket] = useState(null);
 

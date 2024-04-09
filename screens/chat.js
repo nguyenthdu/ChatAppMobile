@@ -13,13 +13,16 @@ import CardImage from "../components/CardImage/CardImage";
 import ImageViewModal from "../components/ImageViewDetail/ImageViewModal";
 import ChatHeader from "../components/UiChat/chatHeader";
 import MessageInput from "../components/UiChat/messageInput";
+import { useChatContext } from "../hooks/AppProvider";
 import { ChatAPI } from "../services/ChatApi";
 import useSocket from "../services/useSocket";
 import { getUserCurrent } from "../utils/AsyncStorage";
 
 const Chat = ({ route, navigation }) => {
   const { recipient } = route.params;
-  const [messages, setMessages] = useState([]);
+  const { messages, setMessages } = useChatContext();
+  const { sendMessage } = useSocket();
+
   const [newMessage, setNewMessage] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const flatListRef = useRef(null);
@@ -27,8 +30,6 @@ const Chat = ({ route, navigation }) => {
   const [messageDeleted, setMessageDeleted] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
-  const { sendMessage } = useSocket({ setMessages, messages });
 
   const toggleModal = (imageUri) => {
     if (!isModalVisible) {

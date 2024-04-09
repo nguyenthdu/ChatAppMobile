@@ -1,28 +1,30 @@
 import axios from "../utils/axios-customize";
 
 export const UploadAPI = {
-  uploadImage: async (image) => {
+  uploadImage: async (images, userId, recipientId) => {
     try {
       let formData = new FormData();
-      formData.append("image", {
-        uri: image[0].uri,
-        name: image[0].fileName,
-        type: image[0].mimeType,
-      });
 
-      const response = await axios.post(
-        "/messages/uploadImageAndGetUrl",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      images.forEach((image, index) => {
+        formData.append(`image${index}`, {
+          uri: image.uri,
+          name: image.fileName,
+          type: image.mimeType,
+        });
+      });
+      formData.append("userId", userId);
+      formData.append("recipientId", recipientId);
+      formData.append("created_at", new Date().toString());
+
+      const response = await axios.post("/messages/uploadFile", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       return response;
     } catch (error) {
-      console.log("Error uploading image:", error);
+      console.log("Error uploading image api:", error);
       return error;
     }
   },
