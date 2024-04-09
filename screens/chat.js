@@ -24,7 +24,7 @@ const Chat = ({ route, navigation }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const flatListRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [messageId, setMessageId] = useState(null);
+  const [messageDeleted, setMessageDeleted] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -91,20 +91,25 @@ const Chat = ({ route, navigation }) => {
   //TODO: Xử lý mở modal
   const handleOpenModal = (item) => {
     setModalVisible(true);
-    setMessageId(item.id);
+    setMessageDeleted(item);
   };
   //TODO: xử lý thu hồi tin nhắn
-  const handleRecallMessage = async (id) => {
-    // try {
-    //   await ChatAPI.removeMessage(id);
-    //   setMessages((prevMessages) =>
-    //     prevMessages.filter((message) => message.id !== id)
-    //   );
-    //   setModalVisible(false);
-    // } catch (error) {
-    //   console.log("Error recalling message: ", error);
-    // }
-    console.log("Thu hồi tin nhắn", id);
+  const handleRecallMessage = async () => {
+    console.log("messageDeleted", messageDeleted);
+    try {
+      const res = await ChatAPI.removeMessage(messageDeleted);
+      console.log("res", res.data);
+      if (res.data) {
+        setMessages((prevMessages) =>
+          prevMessages.filter((msg) => msg.id !== messageDeleted.id)
+        );
+        setModalVisible(false);
+      } else {
+        console.log("Failed to recall message");
+      }
+    } catch (error) {
+      console.log("Error recalling message: ", error);
+    }
   };
 
   // kiểm tra xem link có phải là ảnh không
@@ -223,7 +228,7 @@ const Chat = ({ route, navigation }) => {
               width: "100%",
             }}
           >
-            <TouchableOpacity onPress={() => handleRecallMessage(messageId)}>
+            <TouchableOpacity onPress={() => handleRecallMessage()}>
               <Text style={{ color: "red" }}>Thu hồi tin nhắn</Text>
             </TouchableOpacity>
             <View
