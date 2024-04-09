@@ -5,7 +5,7 @@ import { baseMessage, baseUrl } from "../utils/containUrl";
 
 const useSocket = (props) => {
   // đáng nhẽ phải là messages
-  const { setMessages } = props;
+  const { setMessages, messages } = props;
   const [token, setToken] = useState("");
   const [socket, setSocket] = useState(null);
 
@@ -40,7 +40,7 @@ const useSocket = (props) => {
 
       setSocket(newSocket); // Lưu trữ socket trong state
     }
-  }, [token, setMessages]);
+  }, [token, messages]);
 
   const sendMessage = (newMessage) => {
     if (socket) {

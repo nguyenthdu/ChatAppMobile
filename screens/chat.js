@@ -28,7 +28,7 @@ const Chat = ({ route, navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const { sendMessage } = useSocket({ setMessages });
+  const { sendMessage } = useSocket({ setMessages, messages });
 
   const toggleModal = (imageUri) => {
     if (!isModalVisible) {
