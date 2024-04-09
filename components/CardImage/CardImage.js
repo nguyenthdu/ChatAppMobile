@@ -15,7 +15,7 @@ const CardImage = ({ imageUrl }) => {
           volume={1.0}
           isMuted={false}
           resizeMode="cover"
-          shouldPlay
+          shouldPlay={false}
           isLooping
           style={styles.media}
         />
