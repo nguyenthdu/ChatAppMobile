@@ -3,6 +3,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -28,6 +29,7 @@ const MessageInput = ({
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [dataImageDetail, setDataImageDetail] = useState(null);
 
   const handleSelectedImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -53,6 +55,8 @@ const MessageInput = ({
     });
 
     if (!result.canceled && result.assets) {
+      console.log("Image selected: ", result.assets);
+
       setSelectedDocument(result.assets);
     } else {
       console.log("Document selection cancelled or result.assets undefined");
@@ -114,8 +118,21 @@ const MessageInput = ({
     }
   };
 
-  const toggleModal = () => {
+  const toggleModal = (url) => {
+    setDataImageDetail(url);
     setIsModalVisible(!isModalVisible);
+  };
+
+  const handleDelete = (type, uri) => {
+    if (type === "image") {
+      const updatedImages = [...selectedImage];
+      updatedImages.splice(uri, 1);
+      setSelectedImage(updatedImages);
+    } else if (type === "document") {
+      const updatedDocuments = [...selectedDocument];
+      updatedDocuments.splice(uri, 1);
+      setSelectedDocument(updatedDocuments);
+    }
   };
 
   return (
@@ -125,21 +142,58 @@ const MessageInput = ({
         <Text>Loading...</Text>
       ) : (
         <>
-          {selectedImage && (
-            <View style={styles.selectedImageContainer}>
-              <TouchableOpacity onPress={toggleModal}>
-                <CardImage imageUrl={selectedImage[0].uri} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.deleteImageButton}
-                onPress={() => setSelectedImage(null)}
-              >
-                <MaterialIcons name="cancel" size={24} color="red" />
-              </TouchableOpacity>
-            </View>
-          )}
+          <ScrollView
+            horizontal
+            contentContainerStyle={styles.selectedImageContainer}
+            style={{ width: "100%" }} // Đảm bảo chiều rộng cố định cho ScrollView
+          >
+            {selectedImage &&
+              selectedImage.map((image, index) => (
+                <TouchableOpacity
+                  onPress={() => toggleModal(image.uri)}
+                  key={index}
+                  style={{
+                    marginRight: 5,
+                    width: 100,
+                    height: 100,
+                    marginRight: 20,
+                  }} // Thiết lập kích thước cố định cho hình ảnh
+                >
+                  <CardImage imageUrl={image.uri} />
+                  <TouchableOpacity
+                    style={styles.deleteImageButton}
+                    onPress={() => handleDelete("image", image.uri)} // Thêm hàm xử lý xóa hình ảnh khi được nhấn
+                  >
+                    <MaterialIcons name="cancel" size={24} color="red" />
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              ))}
 
-          {selectedDocument && (
+            {selectedDocument &&
+              selectedDocument.map((document, index) => (
+                <TouchableOpacity key={index}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      height: 50,
+                      marginBottom: 15,
+                      marginRight: 20,
+                    }}
+                  >
+                    <CardFile fileName={document.name} />
+                    <TouchableOpacity
+                      style={styles.deleteDocumentButton}
+                      onPress={() => handleDelete("document", document.uri)} // Thêm hàm xử lý xóa document khi được nhấn
+                    >
+                      <MaterialIcons name="cancel" size={24} color="red" />
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              ))}
+          </ScrollView>
+
+          {/* {selectedDocument && (
             <View style={styles.selectedImageContainer}>
               <TouchableOpacity onPress={toggleModal}>
                 <CardFile fileName={selectedDocument[0].name} />
@@ -151,7 +205,7 @@ const MessageInput = ({
                 <MaterialIcons name="cancel" size={24} color="red" />
               </TouchableOpacity>
             </View>
-          )}
+          )} */}
         </>
       )}
       <View style={styles.inputContainer}>
@@ -179,8 +233,8 @@ const MessageInput = ({
 
       <ImageViewModal
         visible={isModalVisible}
-        imageUri={selectedImage ? selectedImage[0].uri : ""}
-        onClose={toggleModal}
+        imageUri={dataImageDetail ? dataImageDetail : ""}
+        onClose={() => toggleModal(null)}
       />
     </>
   );
@@ -249,13 +303,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#F5F5F5",
     borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    margin: 10,
     marginBottom: 10,
   },
   deleteImageButton: {
-    marginLeft: -10,
-    marginTop: -10,
+    marginLeft: 80,
+    marginTop: -85,
+  },
+  deleteDocumentButton: {
+    marginLeft: -15,
+    marginTop: -20,
   },
 });
 
