@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 const AppContext = createContext();
 
@@ -12,4 +12,4 @@ export const AppProvider = ({ children }) => {
   );
 };
 
-export const useChatContext = () => useContext(AppProvider);
+export const useChatContext = () => useContext(AppContext);
