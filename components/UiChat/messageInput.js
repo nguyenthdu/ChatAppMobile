@@ -44,34 +44,63 @@ const MessageInput = ({
     }
   };
 
+  //TODO:  xử lý chọn file
+  const handleSelectDocument = async () => {
+    let result = await DocumentPicker.getDocumentAsync({
+      type: "*/*",
+      copyToCacheDirectory: true,
+      multiple: true,
+    });
+
+    if (!result.canceled && result.assets) {
+      setSelectedDocument(result.assets);
+    } else {
+      console.log("Document selection cancelled or result.assets undefined");
+    }
+  };
+
   const handleUploadFile = async (type) => {
     setLoading(true);
-    if (type === "image") {
-      const res = await UploadAPI.uploadImage(
-        selectedImage,
-        currentUser.id,
-        recipient.id
-      );
-      console.log("res: ", res.data);
-      if (res?.data) {
-        const newMessageSendServer = [];
-        res.data.forEach((url) => {
-          const messageNew = {
-            text: url,
-            userId: currentUser.id,
-            recipientId: recipient.id,
-            created_at: new Date(),
-            user: currentUser,
-          };
-          newMessageSendServer.push(messageNew);
-        });
-        setMessages([...messages, ...newMessageSendServer]);
-        setLoading(false);
-        setSelectedImage(null);
+    let res = null;
+
+    try {
+      if (type === "image") {
+        res = await UploadAPI.uploadFile(
+          selectedImage,
+          currentUser.id,
+          recipient.id,
+          type
+        );
       } else {
-        setLoading(false);
-        console.error("Error uploading image:", res);
+        console.log("Document selected: ", selectedDocument);
+        res = await UploadAPI.uploadFile(
+          selectedDocument,
+          currentUser.id,
+          recipient.id,
+          type
+        );
       }
+
+      if (res?.data) {
+        const newMessageSendServer = res.data.map((url) => ({
+          text: url,
+          userId: currentUser.id,
+          recipientId: recipient.id,
+          created_at: new Date(),
+          user: currentUser,
+        }));
+
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          ...newMessageSendServer,
+        ]);
+        setSelectedImage(null);
+        setSelectedDocument(null);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,38 +116,6 @@ const MessageInput = ({
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
-  };
-
-  //TODO:  xử lý chọn file
-  const selectDocument = async () => {
-    let result = await DocumentPicker.getDocumentAsync({
-      type: "*/*",
-      copyToCacheDirectory: true,
-      multiple: true,
-    });
-
-    if (!result.canceled && result.assets) {
-      setSelectedDocument(result.assets);
-      console.log("result: ", result.assets[0]);
-      setLoading(true);
-
-      const res = await UploadAPI.uploadDocument(
-        result.assets,
-        currentUser.id,
-        recipient.id
-      );
-      console.log("res: ", res.data);
-      if (res?.data) {
-        setNewMessage(res.data[0]);
-        setLoading(false);
-      } else {
-        setLoading(false);
-        console.error("Error uploading document:", res);
-      }
-    } else {
-      setLoading(false);
-      console.log("Document selection cancelled or result.assets undefined");
-    }
   };
 
   return (
@@ -161,7 +158,7 @@ const MessageInput = ({
         <TouchableOpacity onPress={handleSelectedImage}>
           <Text style={styles.imageButton}>📷</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={selectDocument}>
+        <TouchableOpacity onPress={handleSelectDocument}>
           <Text style={styles.documentButton}>📁</Text>
         </TouchableOpacity>
         <TextInput
