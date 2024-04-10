@@ -183,7 +183,7 @@ const AddFriend = ({ navigation }) => {
             alignItems: "center",
           }}
         >
-          {searchResult ? (
+          {searchResult && searchResult.id !== userCurrent.id ? (
             <View
               style={{
                 flexDirection: "row",
