@@ -1,5 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -31,9 +32,12 @@ export default function Contact({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [sections, setSections] = useState([]);
 
-  useEffect(() => {
-    fetchListFriend();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      // Call your fetch function here
+      fetchListFriend();
+    }, [])
+  );
 
   const fetchListFriend = async () => {
     try {
@@ -42,11 +46,17 @@ export default function Contact({ navigation }) {
       console.log("me: ", me.id);
       const res = await FriendAPI.getListFriends(me.id);
       if (res?.data) {
-        const data = res.data.map(({ id, receiver, status }) => ({
-          id,
-          receiver,
-          status,
-        }));
+        const data = res.data.map(({ id, receiver, sender, status }) => {
+          if (me.id === sender.id) {
+            // Nếu me.id trùng với sender.id, giữ nguyên res.data
+            return { id, receiver, sender, status };
+          } else if (me.id === receiver.id) {
+            // Nếu me.id trùng với receiver.id, hoán đổi vị trí sender và receiver
+            return { id, receiver: sender, sender: receiver, status };
+          } else {
+            return { id, receiver, sender, status };
+          }
+        });
         setFriends(data);
         setLoading(false);
       }
@@ -311,9 +321,10 @@ export default function Contact({ navigation }) {
         </View>
 
         {/* TODO: Hiển thị danh sách bạn bè */}
-        {loading ? (
-          <Text>Loading ...</Text>
-        ) : (
+        {
+          // loading ? (
+          //   <Text>Loading ...</Text>
+          // ) : (
           <SectionList
             style={{ flex: 1 }}
             sections={sections}
@@ -379,7 +390,8 @@ export default function Contact({ navigation }) {
               </Text>
             )}
           />
-        )}
+          // )
+        }
 
         {/* Modal hiển thị thông tin chi tiết của bạn bè */}
         <Modal
