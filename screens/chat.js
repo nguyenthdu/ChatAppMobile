@@ -13,25 +13,28 @@ import CardImage from "../components/CardImage/CardImage";
 import ImageViewModal from "../components/ImageViewDetail/ImageViewModal";
 import ChatHeader from "../components/UiChat/chatHeader";
 import MessageInput from "../components/UiChat/messageInput";
+import { useChatContext } from "../hooks/AppProvider";
 import { ChatAPI } from "../services/ChatApi";
 import useSocket from "../services/useSocket";
 import { getUserCurrent } from "../utils/AsyncStorage";
 
 const Chat = ({ route, navigation }) => {
   const { recipient } = route.params;
-  const [messages, setMessages] = useState([]);
+  const { messages, setMessages } = useChatContext();
+  const { sendMessage } = useSocket();
+
   const [newMessage, setNewMessage] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const flatListRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [messageId, setMessageId] = useState(null);
+  const [messageDeleted, setMessageDeleted] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const { sendMessage } = useSocket({ setMessages });
-
   const toggleModal = (imageUri) => {
-    setSelectedImage(imageUri);
+    if (!isModalVisible) {
+      setSelectedImage(imageUri);
+    }
     setIsModalVisible(!isModalVisible);
   };
 
@@ -89,25 +92,30 @@ const Chat = ({ route, navigation }) => {
   //TODO: Xử lý mở modal
   const handleOpenModal = (item) => {
     setModalVisible(true);
-    setMessageId(item.id);
+    setMessageDeleted(item);
   };
   //TODO: xử lý thu hồi tin nhắn
-  const handleRecallMessage = async (id) => {
-    // try {
-    //   await ChatAPI.removeMessage(id);
-    //   setMessages((prevMessages) =>
-    //     prevMessages.filter((message) => message.id !== id)
-    //   );
-    //   setModalVisible(false);
-    // } catch (error) {
-    //   console.log("Error recalling message: ", error);
-    // }
-    console.log("Thu hồi tin nhắn", id);
+  const handleRecallMessage = async () => {
+    console.log("messageDeleted", messageDeleted);
+    try {
+      const res = await ChatAPI.removeMessage(messageDeleted);
+      console.log("res", res.data);
+      if (res.data) {
+        setMessages((prevMessages) =>
+          prevMessages.filter((msg) => msg.id !== messageDeleted.id)
+        );
+        setModalVisible(false);
+      } else {
+        console.log("Failed to recall message");
+      }
+    } catch (error) {
+      console.log("Error recalling message: ", error);
+    }
   };
 
   // kiểm tra xem link có phải là ảnh không
   const isImageLink = (text) => {
-    return text.match(/\.(jpeg|jpg|gif|png)$/) != null;
+    return text.match(/\.(jpeg|jpg|gif|png|mp4)$/) != null;
   };
 
   // check link có phải file không
@@ -221,7 +229,7 @@ const Chat = ({ route, navigation }) => {
               width: "100%",
             }}
           >
-            <TouchableOpacity onPress={() => handleRecallMessage(messageId)}>
+            <TouchableOpacity onPress={() => handleRecallMessage()}>
               <Text style={{ color: "red" }}>Thu hồi tin nhắn</Text>
             </TouchableOpacity>
             <View

@@ -1,33 +1,28 @@
+import { Video } from "expo-av";
 import React from "react";
 import { Image, StyleSheet, View } from "react-native";
-import { Video } from "expo-av";
+
 const CardImage = ({ imageUrl }) => {
-  // Kiểm tra là link video hay ảnh
-  const isVideo = imageUrl.endsWith(".mp4");
-  if (isVideo) {
-    console.log("link video: ", imageUrl);
-    return (
-      <View style={styles.card}>
+  // Kiểm tra xem nội dung là link video hay ảnh
+  const isVideo = imageUrl.toLowerCase().endsWith(".mp4"); // Chuyển đổi tất cả thành chữ thường trước khi kiểm tra
+
+  return (
+    <View style={styles.card}>
+      {isVideo ? ( // Nếu là video, hiển thị Video component
         <Video
           source={{ uri: imageUrl }}
           rate={1.0}
           volume={1.0}
           isMuted={false}
           resizeMode="cover"
-          shouldPlay
+          shouldPlay={false}
           isLooping
-          style={styles.image}
+          style={styles.media}
         />
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.card}>
-      <Image
-        source={{ uri: imageUrl }}
-        style={imageUrl.startsWith("http") ? styles.imageLink : styles.image}
-      />
+      ) : (
+        // Nếu là ảnh, hiển thị Image component
+        <Image source={{ uri: imageUrl }} style={styles.media} />
+      )}
     </View>
   );
 };
@@ -49,19 +44,11 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  image: {
-    width: 100,
-    height: 100,
-    resizeMode: "cover",
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  // hiện kích thước thật của ảnh
-  imageLink: {
-    width: "100%",
-    height: "auto",
-    aspectRatio: 1, // Giữ tỷ lệ khung hình của ảnh
-    resizeMode: "contain",
+  media: {
+    width: "100%", // Đảm bảo rằng nội dung điều chỉnh theo chiều ngang của phần tử cha
+    height: "auto", // Tự động tính toán chiều cao dựa trên tỷ lệ chiều rộng
+    aspectRatio: 16 / 9, // Giữ tỷ lệ khung hình của nội dung, bạn có thể điều chỉnh theo ý muốn
+    resizeMode: "contain", // Hiển thị nội dung mà không làm biến dạng
     borderRadius: 10,
     marginBottom: 10,
   },

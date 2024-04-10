@@ -45,10 +45,17 @@ const AddFriend = ({ navigation }) => {
       return;
     }
     searchTimeoutRef.current = setTimeout(async () => {
-      const res = await ChatAPI.findUserByPhone(textSearch);
+      const res = await FriendAPI.findUserByPhone(textSearch);
       console.log("res: ", res.data);
-      setSearchResult(res.data);
-      setSearched(true);
+      if (res.data) {
+        if (res.data.status === 404) {
+          setSearchResult(null);
+          setSearched(true);
+        } else {
+          setSearchResult(res.data);
+          setSearched(true);
+        }
+      }
     }, 600);
 
     return () => {
@@ -176,7 +183,7 @@ const AddFriend = ({ navigation }) => {
             alignItems: "center",
           }}
         >
-          {searchResult ? (
+          {searchResult && searchResult.id !== userCurrent.id ? (
             <View
               style={{
                 flexDirection: "row",

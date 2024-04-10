@@ -1,5 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useCallback, useState } from "react";
 import {
   FlatList,
   Image,
@@ -11,14 +12,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { NotificationCustom } from "../components/notification/notification";
 import { COLORS, FONTS, SIZES } from "../constants";
 import { FriendAPI } from "../services/FriendApi";
+import { getUserCurrent } from "../utils/AsyncStorage";
 
 export default function Home({ navigation }) {
   const [isPressAllChat, setIsPressAllChat] = React.useState(true);
   const [isPressGroupChat, setIsPressGroupChat] = React.useState(false);
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleAllChatPress = () => {
     setIsPressAllChat(true);
@@ -31,20 +33,42 @@ export default function Home({ navigation }) {
 
   const [textSearch, setSearch] = React.useState("");
 
-  useEffect(() => {
-    fetchListUserMessage();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      // Call your fetch function here
+      fetchListFriend();
+    }, [])
+  );
 
-  const fetchListUserMessage = async () => {
+  const fetchListFriend = async () => {
     try {
-      const res = await FriendAPI.getListUserMessage();
-      console.log("List user message:", res.data);
-      setData(res.data);
+      setLoading(true);
+      const me = JSON.parse(await getUserCurrent());
+      const res = await FriendAPI.getListFriends(me.id);
+      if (res?.data) {
+        const data = res.data.map(({ id, receiver, sender, status }) => {
+          if (me.id === sender.id) {
+            // Nếu me.id trùng với sender.id, giữ nguyên res.data
+            return { id, receiver, sender, status };
+          } else if (me.id === receiver.id) {
+            // Nếu me.id trùng với receiver.id, hoán đổi vị trí sender và receiver
+            return { id, receiver: sender, sender: receiver, status };
+          } else {
+            return { id, receiver, sender, status };
+          }
+        });
+        const mainData = data.map((friend) => friend.receiver);
+        console.log("data home: ", mainData);
+        setData(mainData);
+        setLoading(false);
+      }
     } catch (error) {
-      console.log("Error fetching list user message:", error);
-      NotificationCustom.errorNotLogin({ navigation });
+      setLoading(false);
+      console.log("Error fetching list friend: ", error);
     }
   };
+
+  //     NotificationCustom.errorNotLogin({ navigation });
 
   return (
     <KeyboardAvoidingView
