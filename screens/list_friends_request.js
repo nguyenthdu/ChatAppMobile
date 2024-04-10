@@ -3,15 +3,19 @@ import React, { useEffect, useState } from "react";
 import { Alert, FlatList, Image, Pressable, Text, View } from "react-native";
 import { COLORS, SIZES } from "../constants";
 import { FriendAPI } from "../services/FriendApi";
+import { getUserCurrent } from "../utils/AsyncStorage";
 
 export default function ListFriendsRequest({ navigation }) {
   const [listFriendRequest, setListFriendRequest] = useState([]);
+
   useEffect(() => {
     fetchListFriendRequestPending();
   }, []);
 
   const fetchListFriendRequestPending = async () => {
-    const res = await FriendAPI.getListFriendRequestPending();
+    const me = JSON.parse(await getUserCurrent());
+    console.log("me: ", me.id);
+    const res = await FriendAPI.getListFriendRequestPending(me.id);
     setListFriendRequest(res.data);
     // console.log("res request: ", res.data);
   };

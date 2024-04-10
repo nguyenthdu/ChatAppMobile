@@ -13,8 +13,10 @@ export const FriendAPI = {
     return axios.post(`/user/accept-friend-request`, { senderId });
   },
 
-  getListFriendRequestPending: () => {
-    return axios.get(`/user/get-list-friend-request-pending`);
+  getListFriendRequestPending: (userCurrentId) => {
+    return axios.get(
+      `/user/get-list-friend-request-pending?userId=${userCurrentId}`
+    );
   },
 
   getListFriends: (userCurrentId) => {
