@@ -17,8 +17,8 @@ export const FriendAPI = {
     return axios.get(`/user/get-list-friend-request-pending`);
   },
 
-  getListFriends: () => {
-    return axios.get(`/user/get-friends`);
+  getListFriends: (userCurrentId) => {
+    return axios.get(`/user/get-friends?userId=${userCurrentId}`);
   },
 
   getListUserMessage: () => {

@@ -14,83 +14,59 @@ import {
   View,
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "../constants";
-
-const friends = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 2,
-    name: "Nguyễn Văn B",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 3,
-    name: "Bình Bình",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 4,
-    name: "Bảo",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 5,
-    name: "Anh Tú",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 6,
-    name: "Trúc anh",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 7,
-    name: "Đào Bình Minh",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-];
+import { FriendAPI } from "../services/FriendApi";
+import { getUserCurrent } from "../utils/AsyncStorage";
 
 export default function Contact({ navigation }) {
-  const [textSearch, setSearch] = React.useState("");
-  const [isPressFriendChat, setIsPressFriendChat] = React.useState(true);
-  const [isPressGroupChat, setIsPressGroupChat] = React.useState(false);
+  const [textSearch, setSearch] = useState("");
+  const [isPressFriendChat, setIsPressFriendChat] = useState(true);
+  const [isPressGroupChat, setIsPressGroupChat] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] =
     useState(false);
   const [friendToDelete, setFriendToDelete] = useState(null);
-  // const [friends, setFriends] = useState([]);
-  const [filteredFriends, setFilteredFriends] = useState(friends);
+  const [friends, setFriends] = useState([]);
+  const [filteredFriends, setFilteredFriends] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [sections, setSections] = useState([]);
+
+  useEffect(() => {
+    fetchListFriend();
+  }, []);
+
+  const fetchListFriend = async () => {
+    try {
+      setLoading(true);
+      const me = JSON.parse(await getUserCurrent());
+      console.log("me: ", me.id);
+      const res = await FriendAPI.getListFriends(me.id);
+      if (res?.data) {
+        const data = res.data.map(({ id, receiver, status }) => ({
+          id,
+          receiver,
+          status,
+        }));
+        setFriends(data);
+        setLoading(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log("Error fetching list friend: ", error);
+    }
+  };
 
   // get list friend khi screen mount
-  // useEffect(() => {
-  //   fetchListFriend();
-  // }, []);
+  useEffect(() => {
+    console.log("Friends", friends);
+  }, [friends]);
 
-  // const fetchListFriend = async () => {
-  //   const res = await FriendAPI.getListFriends();
-  //   console.log("res", res.data);
-  //   setFriends(res.data);
-  // };
-
-  // useEffect(() => {
-  //   console.log("Friends", friends);
-  // }, [friends]);
   //TODO:Xử lý nhấn vào item chuyển sang màn hình chat
   const handleItemPress = (item) => {
-    console.log("Press", item);
-    // navigation.navigate("Chat", { friend: item });
+    console.log("Press", item.receiver);
+    navigation.navigate("Chat", { recipient: item.receiver });
   };
+
   //Xử lý khi nhấn giữ vào item để hiển thị thông tin chi tiết và chức năng khác
   const handleItemLongPress = (item) => {
     setSelectedFriend(item);
@@ -106,35 +82,36 @@ export default function Contact({ navigation }) {
     setIsPressGroupChat(true);
   };
 
-  //TODO:tìm bạn bè theo tên
   useEffect(() => {
     // Lọc danh sách bạn bè dựa trên từ khóa tìm kiếm
     const filtered = friends.filter((friend) =>
-      friend.name.toLowerCase().includes(textSearch.toLowerCase())
+      friend.receiver.username.toLowerCase().includes(textSearch.toLowerCase())
     );
+
+    // Sắp xếp danh sách bạn bè theo tên
+    const sortedFriends = filtered.sort((a, b) =>
+      a.receiver.username.localeCompare(b.receiver.username)
+    );
+
+    // Nhóm bạn bè theo chữ cái đầu tiên của tên
+    const groupedFriends = sortedFriends.reduce((acc, friend) => {
+      const initial = friend.receiver.username.charAt(0).toUpperCase();
+      if (!acc[initial]) {
+        acc[initial] = [];
+      }
+      acc[initial].push(friend);
+      return acc;
+    }, {});
+
+    // Chuyển đổi dữ liệu nhóm bạn bè thành mảng để hiển thị trên SectionList
+    const sections = Object.keys(groupedFriends).map((initial) => ({
+      title: initial,
+      data: groupedFriends[initial],
+    }));
+
     setFilteredFriends(filtered);
-  }, [textSearch]);
-
-  // Sắp xếp danh sách bạn bè theo tên
-  const sortedFriends = filteredFriends.sort((a, b) =>
-    a.name.localeCompare(b.name)
-  );
-
-  // Nhóm bạn bè theo chữ cái đầu tiên của tên
-  const groupedFriends = sortedFriends.reduce((acc, friend) => {
-    const initial = friend.name.charAt(0).toUpperCase();
-    if (!acc[initial]) {
-      acc[initial] = [];
-    }
-    acc[initial].push(friend);
-    return acc;
-  }, {});
-
-  // Chuyển đổi dữ liệu nhóm bạn bè thành mảng để hiển thị trên SectionList
-  const sections = Object.keys(groupedFriends).map((initial) => ({
-    title: initial,
-    data: groupedFriends[initial],
-  }));
+    setSections(sections);
+  }, [friends, textSearch]);
 
   //TODO: Xử lý gọi điện
   const handleCallPress = (item) => {
@@ -334,71 +311,75 @@ export default function Contact({ navigation }) {
         </View>
 
         {/* TODO: Hiển thị danh sách bạn bè */}
-        <SectionList
-          style={{ flex: 1 }}
-          sections={sections}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                marginHorizontal: SIZES.marginHorizontal,
-                marginTop: 10,
-              }}
-              onLongPress={() => handleItemLongPress(item)}
-              onPress={() => handleItemPress(item)}
-            >
-              {/* Hiển thị avatar và tên bạn bè */}
-              <View
+        {loading ? (
+          <Text>Loading ...</Text>
+        ) : (
+          <SectionList
+            style={{ flex: 1 }}
+            sections={sections}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
                 style={{
                   flexDirection: "row",
-                  alignItems: "center",
+                  marginHorizontal: SIZES.marginHorizontal,
+                  marginTop: 10,
                 }}
+                onLongPress={() => handleItemLongPress(item)}
+                onPress={() => handleItemPress(item)}
               >
-                <Image
-                  source={{ uri: item.avatar }}
+                {/* Hiển thị avatar và tên bạn bè */}
+                <View
                   style={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: 25,
-                  }}
-                />
-                <Text
-                  style={{
-                    ...FONTS.body3,
-                    marginLeft: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
                   }}
                 >
-                  {item.name}
-                </Text>
-              </View>
-              {/* Nút gọi và gọi video */}
-              <TouchableOpacity
-                style={{ marginLeft: "auto", padding: 10 }}
-                onPress={() => handleCallPress(item)}
-              >
-                <MaterialIcons name="call" size={24} color="blue" />
+                  <Image
+                    source={{ uri: item.receiver.avatar }}
+                    style={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 25,
+                    }}
+                  />
+                  <Text
+                    style={{
+                      ...FONTS.body3,
+                      marginLeft: 10,
+                    }}
+                  >
+                    {item.receiver.username}
+                  </Text>
+                </View>
+                {/* Nút gọi và gọi video */}
+                <TouchableOpacity
+                  style={{ marginLeft: "auto", padding: 10 }}
+                  onPress={() => handleCallPress(item)}
+                >
+                  <MaterialIcons name="call" size={24} color="blue" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ padding: 10 }}
+                  onPress={() => handleVideoCallPress(item)}
+                >
+                  <MaterialIcons name="video-call" size={24} color="blue" />
+                </TouchableOpacity>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={{ padding: 10 }}
-                onPress={() => handleVideoCallPress(item)}
+            )}
+            renderSectionHeader={({ section: { title } }) => (
+              <Text
+                style={{
+                  ...FONTS.h3,
+                  marginHorizontal: SIZES.marginHorizontal,
+                  marginTop: 20,
+                }}
               >
-                <MaterialIcons name="video-call" size={24} color="blue" />
-              </TouchableOpacity>
-            </TouchableOpacity>
-          )}
-          renderSectionHeader={({ section: { title } }) => (
-            <Text
-              style={{
-                ...FONTS.h3,
-                marginHorizontal: SIZES.marginHorizontal,
-                marginTop: 20,
-              }}
-            >
-              {title}
-            </Text>
-          )}
-        />
+                {title}
+              </Text>
+            )}
+          />
+        )}
 
         {/* Modal hiển thị thông tin chi tiết của bạn bè */}
         <Modal
