@@ -47,8 +47,15 @@ const AddFriend = ({ navigation }) => {
     searchTimeoutRef.current = setTimeout(async () => {
       const res = await FriendAPI.findUserByPhone(textSearch);
       console.log("res: ", res.data);
-      setSearchResult(res.data);
-      setSearched(true);
+      if (res.data) {
+        if (res.data.status === 404) {
+          setSearchResult(null);
+          setSearched(true);
+        } else {
+          setSearchResult(res.data);
+          setSearched(true);
+        }
+      }
     }, 600);
 
     return () => {
