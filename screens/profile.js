@@ -216,6 +216,28 @@ export default function Profile({ navigation }) {
           Đăng xuất
         </Text>
       </Pressable>
+      {/* option group */}
+      <Pressable
+        style={{
+          backgroundColor: "blue",
+          padding: 10,
+          borderRadius: 5,
+          marginHorizontal: 20,
+          marginTop: 20,
+          alignItems: "center",
+        }}
+        onPress={() => navigation.navigate("ChatGroup")}
+      >
+        <Text
+          style={{
+            fontSize: 20,
+            fontFamily: "Roboto",
+            color: "white",
+          }}
+        >
+          Chat Nhóm
+        </Text>
+      </Pressable>
     </View>
   );
 }

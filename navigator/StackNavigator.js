@@ -18,7 +18,10 @@ import Contact from "../screens/contact";
 import Explore from "../screens/explore";
 import HomeScreen from "../screens/home";
 import Profile from "../screens/profile";
-
+import OptionGroup from "../screens/option_group";
+import AddUMembersGroup from "../screens/add_members_group";
+import ListMembersGroup from "../screens/list_members_group";
+import ChatGroup from "../screens/chat_group";
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
@@ -35,6 +38,10 @@ const StackNavigator = () => {
 
       <Stack.Screen name="ListFriendsRequest" component={ListFriendsRequest} />
       <Stack.Screen name="CreateGroup" component={CreateGroup} />
+      <Stack.Screen name="OptionGroup" component={OptionGroup} />
+      <Stack.Screen name="AddMembersGroup" component={AddUMembersGroup} />
+      <Stack.Screen name="ListMembersGroup" component={ListMembersGroup} />
+      <Stack.Screen name="ChatGroup" component={ChatGroup} />
       <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
     </Stack.Navigator>
   );
