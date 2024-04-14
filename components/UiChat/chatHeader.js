@@ -2,6 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "react-native-vector-icons";
 import { COLORS } from "../../constants";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const ChatHeader = ({ recipient, navigation }) => {
   return (
@@ -21,6 +22,12 @@ const ChatHeader = ({ recipient, navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.iconContainer}>
           <Ionicons name="videocam-outline" size={24} color={COLORS.white} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("OptionGroup")}
+          style={styles.iconContainer}
+        >
+          <MaterialIcons name="view-list" size={24} color={COLORS.white} />
         </TouchableOpacity>
       </View>
     </View>
