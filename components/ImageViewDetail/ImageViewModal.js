@@ -20,6 +20,7 @@ const ImageViewModal = ({ visible, imageUri, onClose }) => {
         </TouchableOpacity>
         {isVideo ? ( // Kiểm tra xem có phải là video hay không
           <Video
+            useNativeControls
             source={{ uri: imageUri }}
             rate={1.0}
             volume={1.0}
