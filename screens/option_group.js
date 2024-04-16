@@ -1,32 +1,13 @@
-import { Pressable, StyleSheet, Text, View, ViewBase } from "react-native";
-import React, { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Image, Pressable, Text, View } from "react-native";
+import { useSelector } from "react-redux";
 import { COLORS, SIZES } from "../constants";
-import ImagePickerComponent from "../components/image_picker";
-const data = {
-  id: 1,
-  avatar: "https://i.imgur.com/7ZI1zj3.jpg",
-  name: "Nhóm 1",
-  members: [
-    {
-      id: 1,
-      avatar: "https://i.imgur.com/7ZI1zj3.jpg",
-      name: "Nguyễn Văn A",
-    },
-    {
-      id: 2,
-      avatar: "https://i.imgur.com/7ZI1zj3.jpg",
-      name: "Nguyễn Văn B",
-    },
-    {
-      id: 3,
-      avatar: "https://i.imgur.com/7ZI1zj3.jpg",
-      name: "Nguyễn Văn C",
-    },
-  ],
-};
 export default function OptionGroup({ navigation }) {
-  const [avatar, setAvatar] = useState();
+  const group = useSelector((state) => state.group.group);
+
+  const [avatar, setAvatar] = useState(group?.avatar || "");
+
   const handleImageSelect = (uri) => {
     setAvatar(uri);
   };
@@ -56,7 +37,8 @@ export default function OptionGroup({ navigation }) {
           Tùy chọn
         </Text>
       </Pressable>
-      <ImagePickerComponent onImageSelect={handleImageSelect} />
+
+      {/* <ImagePickerComponent onImageSelect={handleImageSelect} /> */}
       <View
         style={{
           marginHorizontal: 20,
@@ -68,16 +50,29 @@ export default function OptionGroup({ navigation }) {
           borderBottomColor: COLORS.gray2,
         }}
       >
-        <Text
+        <View
           style={{
-            fontSize: SIZES.h3,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          {data.name}
-        </Text>
-        <Pressable>
-          <MaterialIcons name="edit" size={24} color={COLORS.blue} />
-        </Pressable>
+          <Image
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 90,
+            }}
+            source={{ uri: group?.avatar }}
+          />
+          <Text
+            style={{
+              fontSize: SIZES.h3,
+            }}
+          >
+            {group.name}
+          </Text>
+        </View>
       </View>
       <View
         style={{
@@ -107,8 +102,8 @@ export default function OptionGroup({ navigation }) {
           onPress={() =>
             navigation.navigate(
               "ListMembersGroup", //truyền data member sang và log ra
-              { members: data.members },
-              console.log(data.members)
+              { members: group?.users },
+              console.log(group?.users)
             )
           }
           style={{
@@ -124,7 +119,7 @@ export default function OptionGroup({ navigation }) {
               marginLeft: 10,
             }}
           >
-            Xem danh sách thành viên({data.members.length})
+            Xem danh sách thành viên ({group?.users.length})
           </Text>
         </Pressable>
         <Pressable

@@ -12,12 +12,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useDispatch } from "react-redux";
 import { COLORS, FONTS, SIZES } from "../constants";
+import { doSetGroup } from "../redux/group/groupSlice";
 import { chatGroupAPI } from "../services/ChatApi";
 import { FriendAPI } from "../services/FriendApi";
 import { getUserCurrent } from "../utils/AsyncStorage";
 
 export default function Home({ navigation }) {
+  const dispatch = useDispatch();
+
   const [isPressAllChat, setIsPressAllChat] = React.useState(true);
   const [isPressGroupChat, setIsPressGroupChat] = React.useState(false);
   const [data, setData] = useState([]);
@@ -81,10 +85,23 @@ export default function Home({ navigation }) {
       currentUser.id
     );
     if (resGetAllGroup?.data) {
-      setData((prevData) => [...prevData, ...resGetAllGroup?.data]);
-      console.log("res get all group: ", resGetAllGroup?.data);
+      const groupData = resGetAllGroup.data.map((group) => ({
+        ...group,
+        type: "group",
+      }));
+      setData((prevData) => [...prevData, ...groupData]);
+      console.log("res get all group: ", groupData);
     } else {
       console.log("Get all group failed");
+    }
+  };
+
+  const handleChatPress = (item) => {
+    if (item.type === "group") {
+      dispatch(doSetGroup(item));
+      navigation.navigate("ChatGroup", { group: item });
+    } else {
+      navigation.navigate("Chat", { recipient: item });
     }
   };
 
@@ -198,7 +215,7 @@ export default function Home({ navigation }) {
           keyExtractor={(item) => item?.id}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() => navigation.navigate("Chat", { recipient: item })}
+              onPress={() => handleChatPress(item)}
               style={{
                 marginTop: 15,
                 marginHorizontal: SIZES.marginHorizontal,
