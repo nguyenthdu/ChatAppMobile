@@ -90,7 +90,6 @@ export default function Home({ navigation }) {
         type: "group",
       }));
       setData((prevData) => [...prevData, ...groupData]);
-      console.log("res get all group: ", groupData);
     } else {
       console.log("Get all group failed");
     }
