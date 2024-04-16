@@ -35,7 +35,13 @@ const useSocket = (props) => {
       });
 
       newSocket.on(baseMessage, (message) => {
+        console.log("New message:", message);
         setMessages((prevMessages) => [...prevMessages, message]);
+      });
+
+      newSocket.on("group-message", (newMessage) => {
+        console.log("New group newMessage:", newMessage);
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
 
       newSocket.on("create-group", (group) => {
@@ -43,6 +49,14 @@ const useSocket = (props) => {
       });
 
       setSocket(newSocket); // Lưu trữ socket trong state
+
+      // off
+      return () => {
+        newSocket.off(baseMessage);
+        newSocket.off("group-message");
+        newSocket.off("create-group");
+        newSocket.disconnect();
+      };
     }
   }, [token, messages]);
 
@@ -59,7 +73,13 @@ const useSocket = (props) => {
     }
   };
 
-  return { sendMessage, createGroup };
+  const sendMessageGroup = (newMessage) => {
+    if (socket) {
+      socket.emit("group-message", newMessage);
+    }
+  };
+
+  return { sendMessage, createGroup, sendMessageGroup };
 };
 
 export default useSocket;

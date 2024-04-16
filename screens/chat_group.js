@@ -16,15 +16,14 @@ import MessageInput from "../components/UiChat/messageInput";
 import { useChatContext } from "../hooks/AppProvider";
 import { ChatAPI, chatGroupAPI } from "../services/ChatApi";
 import useSocket from "../services/useSocket";
-import { getUserCurrent } from "../utils/AsyncStorage";
 
 const ChatGroup = ({ route, navigation }) => {
-  const { group } = route.params;
+  const { group, currentUser } = route.params;
   const { messages, setMessages } = useChatContext();
-  const { sendMessage } = useSocket();
+  const { sendMessage, sendMessageGroup } = useSocket();
 
   const [newMessage, setNewMessage] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
+  // const [currentUser, setCurrentUser] = useState(null);
   const flatListRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [messageDeleted, setMessageDeleted] = useState(null);
@@ -43,20 +42,21 @@ const ChatGroup = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    fetchCurrentUser();
+    // fetchCurrentUser();
+    fetchMessages();
   }, []);
 
-  const fetchCurrentUser = async () => {
-    try {
-      const me = JSON.parse(await getUserCurrent());
-      setCurrentUser(me);
-      fetchMessages(me);
-    } catch (error) {
-      console.log("Error fetching current user: ", error);
-    }
-  };
+  // const fetchCurrentUser = async () => {
+  //   try {
+  //     const me = JSON.parse(await getUserCurrent());
+  //     setCurrentUser(me);
+  //     fetchMessages(me);
+  //   } catch (error) {
+  //     console.log("Error fetching current user: ", error);
+  //   }
+  // };
 
-  const fetchMessages = async (currentUser) => {
+  const fetchMessages = async () => {
     try {
       const response = await chatGroupAPI.getMessageGroup(group.id);
       console.log("res message group: ", response.data);
@@ -71,20 +71,21 @@ const ChatGroup = ({ route, navigation }) => {
       return;
     }
 
-    // const newMessageSendServer = {
-    //   text: newMessage,
-    //   userId: currentUser.id,
-    //   recipientId: recipient.id,
-    //   created_at: new Date(),
-    //   user: currentUser,
-    // };
+    const newMessageSendServer = {
+      text: newMessage,
+      userId: currentUser.id,
+      roomId: group.id,
+      recipientId: group.id,
+      created_at: new Date(),
+      user: currentUser,
+    };
 
-    // // gọi method của socket
-    // sendMessage(newMessageSendServer);
+    // gọi method của socket
+    sendMessageGroup(newMessageSendServer);
 
-    // setMessages((prevMessages) => [...prevMessages, newMessageSendServer]);
+    setMessages((prevMessages) => [...prevMessages, newMessageSendServer]);
 
-    // setNewMessage("");
+    setNewMessage("");
     scrollBottom();
   };
   //TODO: Xử lý mở modal
@@ -139,7 +140,7 @@ const ChatGroup = ({ route, navigation }) => {
                     styles.messageContainer,
                     {
                       alignSelf:
-                        item.recipientId === group.id
+                        item.user.id === currentUser?.id
                           ? "flex-end"
                           : "flex-start",
                     },
@@ -162,7 +163,7 @@ const ChatGroup = ({ route, navigation }) => {
                     styles.messageContainer,
                     {
                       alignSelf:
-                        item.recipientId === group.id
+                        item.user.id === currentUser?.id
                           ? "flex-end"
                           : "flex-start",
                     },
@@ -177,7 +178,7 @@ const ChatGroup = ({ route, navigation }) => {
                   onLongPress={() => handleOpenModal(item)}
                   style={[
                     styles.messageContainer,
-                    item.recipientId === group.id
+                    item.user.id === currentUser?.id
                       ? styles.otherMessage
                       : styles.myMessage,
                   ]}

@@ -99,7 +99,7 @@ export default function Home({ navigation }) {
   const handleChatPress = (item) => {
     if (item.type === "group") {
       dispatch(doSetGroup(item));
-      navigation.navigate("ChatGroup", { group: item });
+      navigation.navigate("ChatGroup", { group: item, currentUser });
     } else {
       navigation.navigate("Chat", { recipient: item });
     }
