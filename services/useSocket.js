@@ -38,33 +38,13 @@ const useSocket = (props) => {
         setMessages((prevMessages) => [...prevMessages, message]);
       });
 
-      setSocket(newSocket); // Lưu trữ socket trong state
-    }
-  }, [token, messages]);
-
-  // socket nhận danh sách nhóm từ server
-
-  useEffect(() => {
-    if (token) {
-      const newSocket = io(baseUrl, {
-        query: {
-          token: token,
-        },
-      });
-
       newSocket.on("create-group", (group) => {
         console.log("New group created:", group);
       });
 
-      setSocket(newSocket);
+      setSocket(newSocket); // Lưu trữ socket trong state
     }
-
-    return () => {
-      if (socket) {
-        socket.disconnect();
-      }
-    };
-  }, []);
+  }, [token, messages]);
 
   // Hàm gửi yêu cầu tạo nhóm
   const createGroup = (group) => {

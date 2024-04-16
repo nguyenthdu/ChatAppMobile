@@ -10,6 +10,9 @@ export const ChatAPI = {
 };
 
 export const chatGroupAPI = {
+  getMessageGroup: (roomId) => {
+    return axios.get(`/messages/room/${roomId}`);
+  },
   // getGroupByUserId: (userId) => {
   //   return axios.get(`rooms/user/${userId}`);
   // },
