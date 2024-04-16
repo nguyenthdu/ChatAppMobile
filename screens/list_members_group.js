@@ -1,49 +1,20 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  TextInput,
-  TouchableOpacity,
   FlatList,
   Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "../constants";
 
 export default function ListMembersGroup({ navigation, route }) {
   const friends = route.params.members;
   const [textSearch, setSearch] = useState("");
-  //nếu đã là bạn bè thì không hiện icon kết bạn
-  //xử lý hiện icon kêt bạn
-
-  // useEffect(() => {
-  //   const selectedFriendsId = selectedFriends.map((friend) => friend.id);
-  //   const newFriends = friends.map((friend) => {
-  //     if (selectedFriendsId.includes(friend.id)) {
-  //       return { ...friend, selected: true };
-  //     }
-  //     return { ...friend, selected: false };
-  //   });
-  //   friends = newFriends;
-  // }, [selectedFriends]);
-
-  // Lọc danh sách bạn bè theo tên
-  const filteredFriends = friends.filter((friend) =>
-    friend.name.toLowerCase().includes(textSearch.toLowerCase())
-  );
-  //handle remove friend from group
-  const handleRemoveFriend = (friendId) => {
-    // Remove friend if already selected
-    navigation.goBack();
-  };
-  //handle add friend into group
-  const handleAddFriend = () => {
-    // Handle add friend into group
-    navigation.goBack();
-  };
-
   return (
     <View>
       <Pressable
@@ -102,7 +73,7 @@ export default function ListMembersGroup({ navigation, route }) {
       {/* hiển thị danh sách bạn bè */}
       <FlatList
         style={{ height: SIZES.height - 200 }}
-        data={filteredFriends}
+        data={friends}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <Pressable
@@ -110,7 +81,7 @@ export default function ListMembersGroup({ navigation, route }) {
           >
             <View style={styles.friendContainer}>
               <Image source={{ uri: item.avatar }} style={styles.avatar} />
-              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.name}>{item.username}</Text>
               <View
                 style={{
                   flexDirection: "row",
