@@ -42,13 +42,44 @@ const useSocket = (props) => {
     }
   }, [token, messages]);
 
+  // socket nhận danh sách nhóm từ server
+
+  useEffect(() => {
+    if (token) {
+      const newSocket = io(baseUrl, {
+        query: {
+          token: token,
+        },
+      });
+
+      newSocket.on("create-group", (group) => {
+        console.log("New group created:", group);
+      });
+
+      setSocket(newSocket);
+    }
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, []);
+
+  // Hàm gửi yêu cầu tạo nhóm
+  const createGroup = (group) => {
+    if (socket) {
+      socket.emit("create-group", group);
+    }
+  };
+
   const sendMessage = (newMessage) => {
     if (socket) {
       socket.emit(baseMessage, newMessage);
     }
   };
 
-  return { sendMessage };
+  return { sendMessage, createGroup };
 };
 
 export default useSocket;

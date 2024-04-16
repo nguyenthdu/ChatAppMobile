@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "../constants";
+import { chatGroupAPI } from "../services/ChatApi";
 import { FriendAPI } from "../services/FriendApi";
 import { getUserCurrent } from "../utils/AsyncStorage";
 
@@ -21,6 +22,7 @@ export default function Home({ navigation }) {
   const [isPressGroupChat, setIsPressGroupChat] = React.useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const handleAllChatPress = () => {
     setIsPressAllChat(true);
@@ -45,6 +47,7 @@ export default function Home({ navigation }) {
       setLoading(true);
       const me = JSON.parse(await getUserCurrent());
       const res = await FriendAPI.getListFriends(me.id);
+      setCurrentUser(me);
       if (res?.data) {
         const data = res.data.map(({ id, receiver, sender, status }) => {
           if (me.id === sender.id) {
@@ -58,7 +61,6 @@ export default function Home({ navigation }) {
           }
         });
         const mainData = data.map((friend) => friend.receiver);
-        console.log("data home: ", mainData);
         setData(mainData);
         setLoading(false);
       }
@@ -68,7 +70,23 @@ export default function Home({ navigation }) {
     }
   };
 
-  //     NotificationCustom.errorNotLogin({ navigation });
+  useEffect(() => {
+    if (currentUser) {
+      fetchGroup();
+    }
+  }, [currentUser]);
+
+  const fetchGroup = async () => {
+    const resGetAllGroup = await chatGroupAPI.getAllGroupByUserId(
+      currentUser.id
+    );
+    if (resGetAllGroup?.data) {
+      setData((prevData) => [...prevData, ...resGetAllGroup?.data]);
+      console.log("res get all group: ", resGetAllGroup?.data);
+    } else {
+      console.log("Get all group failed");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -223,7 +241,7 @@ export default function Home({ navigation }) {
                       fontFamily: "Roboto",
                     }}
                   >
-                    {item.username}
+                    {item?.username || item?.name}
                   </Text>
                 </View>
               </View>
