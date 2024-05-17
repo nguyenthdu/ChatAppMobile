@@ -1,67 +1,85 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  TextInput,
-  TouchableOpacity,
   FlatList,
   Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
 import ImageGroupPicker from "../components/image_group_picker";
 import { COLORS, FONTS, SIZES } from "../constants";
-const friends = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 2,
-    name: "Nguyễn Văn B",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 3,
-    name: "Bình Bình",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 4,
-    name: "Bảo",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 5,
-    name: "Anh Tú",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 6,
-    name: "Trúc anh",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-  {
-    id: 7,
-    name: "Đào Bình Minh",
-    avatar:
-      "https://gamek.mediacdn.vn/133514250583805952/2020/7/17/-1594971929675695379908.jpg",
-  },
-];
+import { chatGroupAPI } from "../services/ChatApi";
+import { FriendAPI } from "../services/FriendApi";
+import { getUserCurrent } from "../utils/AsyncStorage";
+
 export default function CreateGroup({ navigation }) {
+  const dispatch = useDispatch();
+
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [image, setImage] = useState(null);
   const [textSearch, setSearch] = useState("");
   const [nameGroup, setNameGroup] = useState("");
   const [showCreateGroupButton, setShowCreateGroupButton] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [friends, setFriends] = useState([]);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // Call your fetch function here
+  //     fetchListFriend();
+  //   }, [])
+  // );
+
+  useEffect(() => {
+    if (!currentUser) return;
+    fetchListFriend();
+  }, [currentUser]);
+
+  const fetchListFriend = async () => {
+    try {
+      setLoading(true);
+      const res = await FriendAPI.getListFriends(currentUser.id);
+      if (res?.data) {
+        const data = res.data.map(({ id, receiver, sender, status }) => {
+          if (currentUser.id === sender.id) {
+            // Nếu currentUser.id trùng với sender.id, giữ nguyên res.data
+            return { id, receiver, sender, status };
+          } else if (currentUser.id === receiver.id) {
+            // Nếu currentUser.id trùng với receiver.id, hoán đổi vị trí sender và receiver
+            return { id, receiver: sender, sender: receiver, status };
+          } else {
+            return { id, receiver, sender, status };
+          }
+        });
+        setFriends(data);
+        setLoading(false);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log("Error fetching list friend: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const me = JSON.parse(await getUserCurrent());
+      setCurrentUser(me);
+    } catch (error) {
+      console.log("Error fetching current user: ", error);
+    }
+  };
+
   useEffect(() => {
     // Kiểm tra số lượng bạn bè được chọn để quyết định hiển thị nút tạo nhóm
     if (selectedFriends.length >= 2) {
@@ -75,25 +93,48 @@ export default function CreateGroup({ navigation }) {
   const handleImageSelect = (imageUri) => {
     setImage(imageUri); // Cập nhật đường dẫn của hình ảnh được chọn
   };
-  //TODO: xu ly chon ban be
+
   const handleFriendSelect = (friendId) => {
-    // Check if friend is already selected
-    const isSelected = selectedFriends.some((friend) => friend.id === friendId);
+    // Kiểm tra xem bạn đã được chọn chưa
+    const isSelected = selectedFriends.includes(friendId);
     if (isSelected) {
-      // Remove friend if already selected
-      setSelectedFriends(
-        selectedFriends.filter((friend) => friend.id !== friendId)
-      );
+      // Xóa bạn nếu đã được chọn
+      setSelectedFriends(selectedFriends.filter((id) => id !== friendId));
     } else {
-      // Add friend to selected list if not already selected
-      const friend = friends.find((friend) => friend.id === friendId);
-      setSelectedFriends([...selectedFriends, friend]);
+      // Thêm bạn vào danh sách đã chọn nếu chưa được chọn
+      setSelectedFriends([...selectedFriends, friendId]);
     }
   };
+
   // Lọc danh sách bạn bè theo tên
-  const filteredFriends = friends.filter((friend) =>
-    friend.name.toLowerCase().includes(textSearch.toLowerCase())
-  );
+  // const filteredFriends = friends.filter((friend) =>
+  //   friend.name.toLowerCase().includes(textSearch.toLowerCase())
+  // );
+
+  const handleCreateGroup = async () => {
+    const newGroup = {
+      name: nameGroup,
+      avatar:
+        "https://onthi1.s3.ap-southeast-1.amazonaws.com/1713240798265_1000076554.jpg",
+      ownerId: currentUser.id,
+      member: [...selectedFriends, currentUser.id],
+    };
+
+    try {
+      const res = await chatGroupAPI.createGroup(newGroup);
+      if (res?.data) {
+        console.log("Create group successfully: ", res?.data);
+        // chuyeern den trang home
+        ToastAndroid.show(`Create group ${res?.data?.name} successfully`, 1000);
+        navigation.navigate("Home");
+      } else {
+        console.log("Create group failed");
+        // toast.error("Create group failed");
+      }
+    } catch (error) {
+      console.log("error: ", error);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -191,22 +232,25 @@ export default function CreateGroup({ navigation }) {
       </View>
       {/* hiển thị danh sách bạn bè */}
       <FlatList
-        data={filteredFriends}
+        data={friends}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <Pressable onPress={() => handleFriendSelect(item.id)}>
+          <Pressable onPress={() => handleFriendSelect(item.receiver.id)}>
             <View style={styles.friendContainer}>
-              <Image source={{ uri: item.avatar }} style={styles.avatar} />
-              <Text style={styles.name}>{item.name}</Text>
+              <Image
+                source={{ uri: item.receiver.avatar }}
+                style={styles.avatar}
+              />
+              <Text style={styles.name}>{item.receiver.username}</Text>
               <MaterialIcons
                 name={
-                  selectedFriends.some((friend) => friend.id === item.id)
+                  selectedFriends.some((id) => id === item.receiver.id)
                     ? "check-circle"
                     : "check-circle-outline"
                 }
                 size={24}
                 color={
-                  selectedFriends.some((friend) => friend.id === item.id)
+                  selectedFriends.some((id) => id === item.receiver.id)
                     ? COLORS.blue
                     : "gray"
                 }
@@ -227,14 +271,7 @@ export default function CreateGroup({ navigation }) {
             alignItems: "center",
             marginBottom: 20,
           }}
-          onPress={() => {
-            // Xử lý tạo nhóm
-            console.log("data", {
-              name: nameGroup,
-              image,
-              members: selectedFriends,
-            });
-          }}
+          onPress={() => handleCreateGroup()}
         >
           <Text style={{ color: "white", fontSize: 20 }}>Tạo nhóm</Text>
         </TouchableOpacity>

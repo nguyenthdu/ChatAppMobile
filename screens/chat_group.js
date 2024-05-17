@@ -14,17 +14,16 @@ import ImageViewModal from "../components/ImageViewDetail/ImageViewModal";
 import ChatHeader from "../components/UiChat/chatHeader";
 import MessageInput from "../components/UiChat/messageInput";
 import { useChatContext } from "../hooks/AppProvider";
-import { ChatAPI } from "../services/ChatApi";
+import { ChatAPI, chatGroupAPI } from "../services/ChatApi";
 import useSocket from "../services/useSocket";
-import { getUserCurrent } from "../utils/AsyncStorage";
 
 const ChatGroup = ({ route, navigation }) => {
-  const { recipient } = route.params;
+  const { group, currentUser } = route.params;
   const { messages, setMessages } = useChatContext();
-  const { sendMessage } = useSocket();
+  const { sendMessage, sendMessageGroup } = useSocket();
 
   const [newMessage, setNewMessage] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
+  // const [currentUser, setCurrentUser] = useState(null);
   const flatListRef = useRef(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [messageDeleted, setMessageDeleted] = useState(null);
@@ -43,25 +42,24 @@ const ChatGroup = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    fetchCurrentUser();
+    // fetchCurrentUser();
+    fetchMessages();
   }, []);
 
-  const fetchCurrentUser = async () => {
-    try {
-      const me = JSON.parse(await getUserCurrent());
-      setCurrentUser(me);
-      fetchMessages(me);
-    } catch (error) {
-      console.log("Error fetching current user: ", error);
-    }
-  };
+  // const fetchCurrentUser = async () => {
+  //   try {
+  //     const me = JSON.parse(await getUserCurrent());
+  //     setCurrentUser(me);
+  //     fetchMessages(me);
+  //   } catch (error) {
+  //     console.log("Error fetching current user: ", error);
+  //   }
+  // };
 
-  const fetchMessages = async (currentUser) => {
+  const fetchMessages = async () => {
     try {
-      const response = await ChatAPI.getListOneUserMessage(
-        currentUser.id,
-        recipient.id
-      );
+      const response = await chatGroupAPI.getMessageGroup(group.id);
+      console.log("res message group: ", response.data);
       setMessages(response.data);
     } catch (error) {
       console.log("Error fetching messages: ", error);
@@ -76,13 +74,14 @@ const ChatGroup = ({ route, navigation }) => {
     const newMessageSendServer = {
       text: newMessage,
       userId: currentUser.id,
-      recipientId: recipient.id,
+      roomId: group.id,
+      recipientId: group.id,
       created_at: new Date(),
       user: currentUser,
     };
 
     // gọi method của socket
-    sendMessage(newMessageSendServer);
+    sendMessageGroup(newMessageSendServer);
 
     setMessages((prevMessages) => [...prevMessages, newMessageSendServer]);
 
@@ -125,7 +124,7 @@ const ChatGroup = ({ route, navigation }) => {
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-      <ChatHeader recipient={recipient} navigation={navigation} />
+      <ChatHeader group={group} navigation={navigation} />
       <View style={{ flex: 1, padding: 10 }}>
         <FlatList
           ref={flatListRef}
@@ -141,7 +140,7 @@ const ChatGroup = ({ route, navigation }) => {
                     styles.messageContainer,
                     {
                       alignSelf:
-                        item.recipientId === recipient.id
+                        item.user.id === currentUser?.id
                           ? "flex-end"
                           : "flex-start",
                     },
@@ -164,7 +163,7 @@ const ChatGroup = ({ route, navigation }) => {
                     styles.messageContainer,
                     {
                       alignSelf:
-                        item.recipientId === recipient.id
+                        item.user.id === currentUser?.id
                           ? "flex-end"
                           : "flex-start",
                     },
@@ -179,7 +178,7 @@ const ChatGroup = ({ route, navigation }) => {
                   onLongPress={() => handleOpenModal(item)}
                   style={[
                     styles.messageContainer,
-                    item.recipientId === recipient.id
+                    item.user.id === currentUser?.id
                       ? styles.otherMessage
                       : styles.myMessage,
                   ]}
@@ -196,7 +195,7 @@ const ChatGroup = ({ route, navigation }) => {
           setNewMessage={setNewMessage}
           newMessage={newMessage}
           currentUser={currentUser}
-          recipient={recipient}
+          recipient={group}
         />
       </View>
       <Modal

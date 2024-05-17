@@ -1,10 +1,10 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "react-native-vector-icons";
 import { COLORS } from "../../constants";
-import { MaterialIcons } from "@expo/vector-icons";
 
-const ChatHeader = ({ recipient, navigation }) => {
+const ChatHeader = ({ recipient, group, navigation }) => {
   return (
     <View style={styles.header}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -14,7 +14,9 @@ const ChatHeader = ({ recipient, navigation }) => {
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.username}>{recipient.username}</Text>
+        <Text style={styles.username}>
+          {recipient?.username || group?.name}
+        </Text>
       </View>
       <View style={styles.callButtons}>
         <TouchableOpacity style={styles.iconContainer}>
@@ -23,12 +25,14 @@ const ChatHeader = ({ recipient, navigation }) => {
         <TouchableOpacity style={styles.iconContainer}>
           <Ionicons name="videocam-outline" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("OptionGroup")}
-          style={styles.iconContainer}
-        >
-          <MaterialIcons name="view-list" size={24} color={COLORS.white} />
-        </TouchableOpacity>
+        {group && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate("OptionGroup")}
+            style={styles.iconContainer}
+          >
+            <MaterialIcons name="view-list" size={24} color={COLORS.white} />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
