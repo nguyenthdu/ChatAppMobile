@@ -1,6 +1,7 @@
 import { Dimensions } from "react-native";
 //expo font
 const { width, height } = Dimensions.get("window");
+
 export const COLORS = {
   blue: "#0573ff",
   gray: "#f5f5f5",

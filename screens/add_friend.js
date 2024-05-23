@@ -1,90 +1,81 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Image,
-  Pressable,
-  Text,
-  TextInput,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Pressable, Text, TextInput, ToastAndroid, TouchableOpacity, View } from "react-native";
+import AccountItem from "../components/AccountItem/AccountItem";
 import { COLORS, FONTS, SIZES } from "../constants";
+import useCancelFriendRequest from "../hooks/friend/useCancelFriendRequest";
+import useDebounce from "../hooks/friend/useDebounce";
+import useGetListRequestSended from "../hooks/friend/useGetListRequestSended";
 import { FriendAPI } from "../services/FriendApi";
 import { getUserCurrent } from "../utils/AsyncStorage";
+import { useFriendStore } from "../zustand/useFriendStore";
 
 const AddFriend = ({ navigation }) => {
-  const [textSearch, setSearch] = useState("");
-  const [searchResult, setSearchResult] = useState(null);
-  const [userCurrent, setCurrentUser] = useState();
-  const [sendRequest, setSendRequest] = useState(false);
-  // sau 1s sẽ gọi API tìm kiếm user theo số điện thoại
-  const [searched, setSearched] = useState(false);
-  const searchTimeoutRef = useRef(null);
+  const currentUser = getUserCurrent();
+  const [searchValue, setSearchValue] = useState("");
+  const [resultSearch, setResultSearch] = useState(null);
+  const debounce = useDebounce({ value: searchValue, delay: 800 });
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
+  const { listPendingSended, resetFriendStore, listFriend } = useFriendStore();
+  const { getListRequestSended } = useGetListRequestSended();
+  const { cancelFriendRequest } = useCancelFriendRequest();
 
-  const fetchCurrentUser = async () => {
+  const isSendRequest =
+    Array.isArray(listPendingSended) &&
+    !!listPendingSended?.find((item) => item?.receiver?.phone === resultSearch?.phone);
+  const isFriend =
+    Array.isArray(listFriend) && !!listFriend?.find((item) => item?.phone === resultSearch?.phone);
+  const isMe = resultSearch?.phone === currentUser?.user?.phone;
+
+  const handleAddFriend = async (item) => {
     try {
-      const me = JSON.parse(await getUserCurrent());
-      setCurrentUser(me);
+      const res = await FriendAPI.sendFriendRequest({ receiverId: item?.id });
+      if (res?.data) {
+        ToastAndroid.show(
+          `Đã gửi lời mời kết bạn đến ${item?.username} thành công`,
+          ToastAndroid.SHORT,
+        );
+        getListRequestSended(currentUser?.user?.id);
+      } else {
+        ToastAndroid.show(`Gửi lời mời kết bạn đến ${item?.username} thất bại`, ToastAndroid.SHORT);
+      }
     } catch (error) {
-      console.log("Error fetching current user: ", error);
+      console.log("Error occurred while adding friend:", error);
+      ToastAndroid.show(`Đã xảy ra lỗi khi thêm bạn bè`, ToastAndroid.SHORT);
     }
   };
 
-  // sau 600ms thì tự tìm
-  useEffect(() => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
+  const handleCancelRequest = async (item) => {
+    resetFriendStore();
+    cancelFriendRequest(item?.id);
+  };
+
+  const handleSearchUser = async () => {
+    setIsLoading(true);
+    try {
+      const res = await FriendAPI.findUserByPhone(debounce);
+      if (res?.data?.status === 404) {
+        setResultSearch(null);
+      } else if (res && res?.data) {
+        setResultSearch(res.data);
+      } else {
+        setResultSearch(null);
+      }
+    } catch (error) {
+      console.error("Error occurred while fetching user data:", error);
+    } finally {
+      setIsLoading(false);
     }
-    if (!textSearch) {
-      setSearched(false);
+  };
+
+  useEffect(() => {
+    if (!String(debounce)?.trim()) {
+      setResultSearch(null);
       return;
     }
-    searchTimeoutRef.current = setTimeout(async () => {
-      const res = await FriendAPI.findUserByPhone(textSearch);
-      console.log("res: ", res.data);
-      if (res.data) {
-        if (res.data.status === 404) {
-          setSearchResult(null);
-          setSearched(true);
-        } else {
-          setSearchResult(res.data);
-          setSearched(true);
-        }
-      }
-    }, 600);
-
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, [textSearch]);
-
-  // tìm ngay lập tức
-  const handleSearch = async () => {
-    setSearched(false);
-    const res = await FriendAPI.findUserByPhone(textSearch);
-    setSearchResult(res.data);
-    setSearched(true);
-  };
-
-  //xử lý gửi lời mời kết bạn
-  const handleAddFriend = async (receiverId) => {
-    const res = await FriendAPI.sendFriendRequest(userCurrent.id, receiverId);
-    console.log("res: ", res.data);
-    if (res.data.message.includes("successfully"))
-      // thay đổi thành nút đã gửi
-      setSendRequest(true);
-    ToastAndroid.show("Gửi kết bạn thành công", ToastAndroid.SHORT);
-    // Alert.alert("Thông báo", "Gửi kết bạn thành công.", [
-    //   { text: "OK", onPress: () => navigation.goBack() },
-    // ]);
-  };
+    handleSearchUser();
+  }, [debounce]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -126,8 +117,8 @@ const AddFriend = ({ navigation }) => {
         <MaterialIcons name="search" size={24} color="blue" />
 
         <TextInput
-          value={textSearch}
-          onChangeText={(text) => setSearch(text)}
+          value={searchValue}
+          onChangeText={(text) => setSearchValue(text)}
           style={{
             marginLeft: 10,
             height: "100%",
@@ -142,14 +133,14 @@ const AddFriend = ({ navigation }) => {
             alignItems: "center",
             justifyContent: "center",
           }}
-          onPress={() => setSearch("")}
+          onPress={() => setSearchValue("")}
         >
           <MaterialIcons name="clear" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
       <Pressable
-        onPress={handleSearch}
+        onPress={handleSearchUser}
         style={{
           justifyContent: "center",
           marginTop: 10,
@@ -171,8 +162,9 @@ const AddFriend = ({ navigation }) => {
         </Text>
       </Pressable>
 
-      {/* Hiển thị kết quả tìm kiếm */}
-      {searched ? (
+      {isLoading ? (
+        <Text>Loading...</Text>
+      ) : resultSearch ? (
         <View
           style={{
             flexDirection: "row",
@@ -183,59 +175,25 @@ const AddFriend = ({ navigation }) => {
             alignItems: "center",
           }}
         >
-          {searchResult && searchResult.id !== userCurrent.id ? (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={{ uri: searchResult.avatar }}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 90,
-                  }}
-                />
-                <View style={{ marginLeft: 10 }}>
-                  <Text style={{ ...FONTS.body3 }}>
-                    {searchResult.username}
-                  </Text>
-                </View>
-              </View>
-              <Pressable
-                style={{
-                  backgroundColor: sendRequest ? COLORS.gray : COLORS.blue,
-                  padding: 10,
-                  borderRadius: 10,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {sendRequest ? (
-                  <Text onPress={() => setSendRequest(false)}>Hủy lời mời</Text>
-                ) : (
-                  <MaterialIcons
-                    name="person-add"
-                    size={24}
-                    color="white"
-                    onPress={() => handleAddFriend(searchResult.id)}
-                  />
-                )}
-              </Pressable>
-            </View>
+          {isMe && resultSearch ? (
+            <AccountItem data={resultSearch} title="(Bạn)" />
+          ) : isFriend && resultSearch ? (
+            <AccountItem data={resultSearch} title="(Bạn bè)" />
+          ) : isSendRequest && resultSearch ? (
+            <AccountItem
+              title={"Hủy lời mời"}
+              data={resultSearch}
+              onClick={() => handleCancelRequest(resultSearch)}
+            />
+          ) : resultSearch ? (
+            <AccountItem
+              data={resultSearch}
+              onClick={() => handleAddFriend(resultSearch)}
+              title={"Kết bạn"}
+            />
           ) : (
             <Text style={{ ...FONTS.body3, textAlign: "center" }}>
-              Không tìm thấy kết quả
+              Nhập số điện thoại để tìm kiếm
             </Text>
           )}
         </View>

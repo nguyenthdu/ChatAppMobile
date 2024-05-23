@@ -43,13 +43,13 @@ export default function Home({ navigation }) {
     useCallback(() => {
       // Call your fetch function here
       fetchListFriend();
-    }, [])
+    }, []),
   );
 
   const fetchListFriend = async () => {
     try {
       setLoading(true);
-      const me = JSON.parse(await getUserCurrent());
+      const me = await getUserCurrent();
       const res = await FriendAPI.getListFriends(me.id);
       setCurrentUser(me);
       if (res?.data) {
@@ -81,9 +81,7 @@ export default function Home({ navigation }) {
   }, [currentUser]);
 
   const fetchGroup = async () => {
-    const resGetAllGroup = await chatGroupAPI.getAllGroupByUserId(
-      currentUser.id
-    );
+    const resGetAllGroup = await chatGroupAPI.getAllGroupByUserId(currentUser.id);
     if (resGetAllGroup?.data) {
       const groupData = resGetAllGroup.data.map((group) => ({
         ...group,
@@ -105,10 +103,7 @@ export default function Home({ navigation }) {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : null}
-      style={{ flex: 1 }}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : null} style={{ flex: 1 }}>
       <SafeAreaView
         style={{
           flex: 1,
@@ -236,9 +231,7 @@ export default function Home({ navigation }) {
                     borderRadius: 25,
                   }}
                   source={
-                    item.avatar
-                      ? { uri: item.avatar }
-                      : require("../assets/image/avatar.png")
+                    item.avatar ? { uri: item.avatar } : require("../assets/image/avatar.png")
                   }
                 />
                 <View

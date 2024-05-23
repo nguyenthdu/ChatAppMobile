@@ -20,7 +20,7 @@ instance.interceptors.request.use(
   function (error) {
     // Xử lý lỗi request
     return Promise.reject(error);
-  }
+  },
 );
 
 // Add a response interceptor
@@ -59,7 +59,7 @@ instance.interceptors.response.use(
     }
     // Trả về lỗi nếu không thực hiện được
     return Promise.reject(error);
-  }
+  },
 );
 
 export default instance;
